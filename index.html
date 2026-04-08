@@ -136,6 +136,9 @@ body{
   letter-spacing:0.3px;
 }
 
+/* ── SECTION HIDDEN ── */
+.section.hidden{display:none;}
+
 /* ── SECTION CARDS ── */
 .section{
   margin:16px 16px 0;
@@ -569,19 +572,13 @@ body{
   <!-- Live Prompt -->
   <div class="prompt-card">
     <div class="prompt-label">Active Scenario</div>
-    <div class="prompt-text">
-      A
-      <span class="blank empty" id="prompt-coverage">coverage</span>
-      <span class="blank empty" id="prompt-orient">orientation</span>
-      sprinkler is
-      <span class="blank empty" id="prompt-b">?</span>
-      above the bottom of a
-      <span class="blank empty" id="prompt-obs">obstruction</span>.
+    <div class="prompt-text" id="prompt-sentence">
+      Select options below to build your scenario.
     </div>
   </div>
 
-  <!-- Step 1: Coverage Type -->
-  <div class="section">
+  <!-- Step 1: Coverage Type — always visible -->
+  <div class="section" id="obs-sec-1">
     <div class="section-head">
       <div class="step-badge">1</div>
       <div class="sec-label">Coverage Type</div>
@@ -589,17 +586,20 @@ body{
     <div class="section-body">
       <div class="toggle-group">
         <button class="toggle-btn" id="btn-cov-std" onclick="setCoverage('standard')">
-          STANDARD<br><small>SSU · SSP · SSW</small>
+          STANDARD
         </button>
         <button class="toggle-btn" id="btn-cov-ext" onclick="setCoverage('extended')">
-          EXTENDED<br><small>ECU · ECP · ECSW</small>
+          EXTENDED
+        </button>
+        <button class="toggle-btn" id="btn-cov-res" onclick="setCoverage('residential')">
+          RESIDENTIAL
         </button>
       </div>
     </div>
   </div>
 
-  <!-- Step 2: Orientation -->
-  <div class="section">
+  <!-- Step 2: Orientation — hidden until coverage selected -->
+  <div class="section hidden" id="obs-sec-2">
     <div class="section-head">
       <div class="step-badge">2</div>
       <div class="sec-label">Sprinkler Orientation</div>
@@ -619,22 +619,63 @@ body{
     </div>
   </div>
 
-  <!-- Step 3: Distance B -->
-  <div class="section">
+  <!-- Step 3A: Sidewall Obstruction Orientation — sidewall path only -->
+  <div class="section hidden" id="obs-sec-sw-orient">
     <div class="section-head">
       <div class="step-badge">3</div>
+      <div class="sec-label">Obstruction Orientation</div>
+    </div>
+    <div class="section-body">
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <button class="toggle-btn" id="btn-sw-along" onclick="setSWObsOrient('along_wall')" style="text-align:left;padding:14px 16px;">
+          ALONG THE WALL
+          <small>§ 8.7.5.1.4 · Lintel or soffit on same wall</small>
+        </button>
+        <button class="toggle-btn" id="btn-sw-vert" onclick="setSWObsOrient('vertical')" style="text-align:left;padding:14px 16px;">
+          VERTICAL OBSTRUCTION
+          <small>§ 8.7.5.2.1.3(a) · Columns, vertical pipes</small>
+        </button>
+        <button class="toggle-btn" id="btn-sw-horiz" onclick="setSWObsOrient('horizontal')" style="text-align:left;padding:14px 16px;">
+          HORIZONTAL ORIENTATION
+          <small>§ 8.7.5.2.1.3(b) · Horizontal beams, ducts</small>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Step 3B: Deflector Height — upright/pendant + along-wall sidewall -->
+  <div class="section hidden" id="obs-sec-dist">
+    <div class="section-head">
+      <div class="step-badge" id="dist-badge">3</div>
       <div class="sec-label">Deflector Height Above Obstruction Bottom</div>
     </div>
     <div class="section-body">
-      <div class="dist-field" id="field-b-in" onclick="openKeypad()" style="max-width:180px">
+      <div class="dist-field" id="field-b-in" onclick="openKeypad('bIn')" style="max-width:180px">
         <div class="df-val" id="val-b-in">0</div>
         <div class="df-unit">inches ▸</div>
       </div>
     </div>
   </div>
 
-  <!-- Step 4: Obstruction Type -->
-  <div class="section">
+  <!-- Step 3C: Obstruction Max Dimension — vertical/horizontal sidewall -->
+  <div class="section hidden" id="obs-sec-dim">
+    <div class="section-head">
+      <div class="step-badge">3</div>
+      <div class="sec-label">Maximum Dimension of Obstruction (C or D)</div>
+    </div>
+    <div class="section-body">
+      <div class="dist-field" id="field-obs-dim" onclick="openKeypad('dim')" style="max-width:180px">
+        <div class="df-val" id="val-obs-dim">0</div>
+        <div class="df-unit">inches ▸</div>
+      </div>
+      <div style="font-size:11px;color:var(--text3);margin-top:8px;line-height:1.5;">
+        Enter the largest cross-sectional dimension (width or depth) of the obstruction in inches.
+      </div>
+    </div>
+  </div>
+
+  <!-- Step 4: Obstruction Type — upright/pendant only -->
+  <div class="section hidden" id="obs-sec-obstype">
     <div class="section-head">
       <div class="step-badge">4</div>
       <div class="sec-label">Obstruction Type</div>
@@ -816,8 +857,15 @@ body{
 // STATE
 // ═══════════════════════════════════════════════════
 const state = {
-  obs: { coverage: null, orient: null, bIn: 0, obsType: null },
-  sp:  { orient: null, hazard: null, construction: null, ceil: null, sysType: null }
+  obs: {
+    coverage:    null,
+    orient:      null,
+    swObsOrient: null,
+    bIn:         0,
+    obsDim:      0,
+    obsType:     null
+  },
+  sp: { orient: null, hazard: null, construction: null, ceil: null, sysType: null }
 };
 
 // ═══════════════════════════════════════════════════
@@ -831,24 +879,30 @@ function goTo(id) {
 }
 
 // ═══════════════════════════════════════════════════
-// KEYPAD
+// KEYPAD  (target: 'bIn' or 'dim')
 // ═══════════════════════════════════════════════════
 let kpBuffer = '';
+let kpTarget = 'bIn';
 
-function openKeypad() {
-  kpBuffer = state.obs.bIn === 0 ? '' : String(state.obs.bIn);
+function openKeypad(target) {
+  kpTarget = target || 'bIn';
+  const cur = kpTarget === 'dim' ? state.obs.obsDim : state.obs.bIn;
+  kpBuffer = cur === 0 ? '' : String(cur);
 
-  document.getElementById('kp-field-label').textContent = 'INCHES';
-  document.getElementById('kp-hint').textContent = 'Enter total inches above obstruction bottom, then OK';
+  document.getElementById('kp-field-label').textContent = kpTarget === 'dim' ? 'OBSTRUCTION SIZE' : 'INCHES';
+  document.getElementById('kp-hint').textContent = kpTarget === 'dim'
+    ? 'Max dimension of obstruction (in), then OK'
+    : 'Deflector height above obstruction bottom (in), then OK';
   document.getElementById('kp-display').textContent = kpBuffer || '0';
-  document.getElementById('field-b-in').classList.add('active-field');
 
+  const activeId = kpTarget === 'dim' ? 'field-obs-dim' : 'field-b-in';
+  document.getElementById(activeId).classList.add('active-field');
   document.getElementById('kp-overlay').classList.add('open');
 }
 
 function closeKeypad() {
   document.getElementById('kp-overlay').classList.remove('open');
-  document.getElementById('field-b-in').classList.remove('active-field');
+  document.querySelectorAll('.dist-field').forEach(f => f.classList.remove('active-field'));
   kpBuffer = '';
 }
 
@@ -861,8 +915,13 @@ function kpKey(key) {
     kpBuffer = kpBuffer.slice(0, -1);
   } else if (key === 'ok') {
     const val = Math.max(0, parseInt(kpBuffer) || 0);
-    state.obs.bIn = val;
-    document.getElementById('val-b-in').textContent = val;
+    if (kpTarget === 'dim') {
+      state.obs.obsDim = val;
+      document.getElementById('val-obs-dim').textContent = val;
+    } else {
+      state.obs.bIn = val;
+      document.getElementById('val-b-in').textContent = val;
+    }
     updateObsPrompt();
     clearObsResult();
     closeKeypad();
@@ -895,24 +954,73 @@ const TABLE_UPRIGHT = [
   { minA: 84,  maxB: 35   },
 ];
 
-// Table 8.7.5.1.3 — Standard Sidewall (SSW)
-const TABLE_SIDEWALL = [
-  { minA: 48,  maxB: 1  },
-  { minA: 60,  maxB: 2  },
-  { minA: 66,  maxB: 3  },
-  { minA: 72,  maxB: 4  },
-  { minA: 78,  maxB: 6  },
-  { minA: 84,  maxB: 7  },
-  { minA: 90,  maxB: 9  },
-  { minA: 96,  maxB: 11 },
-  { minA: 102, maxB: 14 },
+// Table 8.7.5.1.4 — Standard Sidewall Along-Wall obstructions
+const TABLE_SW_ALONG_WALL = [
+  { minA: 4,  maxB: 1     },
+  { minA: 6,  maxB: 2     },
+  { minA: 12, maxB: 3     },
+  { minA: 18, maxB: 4.5   },
+  { minA: 24, maxB: 5.75  },
+  { minA: 30, maxB: 7     },
+  { minA: 36, maxB: 8     },
+  { minA: 42, maxB: 9.25  },
+  { minA: 48, maxB: 10    },
+  { minA: 54, maxB: 11.5  },
+  { minA: 60, maxB: 12.75 },
+  { minA: 66, maxB: 14    },
+  { minA: 72, maxB: 15    },
+  { minA: 78, maxB: 16.25 },
+  { minA: 84, maxB: 17.5  },
 ];
 
-function lookupMinA(orientation, bInches) {
-  const table = orientation === 'sidewall' ? TABLE_SIDEWALL : TABLE_UPRIGHT;
-  if (orientation !== 'sidewall' && bInches === 0) return { minA: 0, special: 'zero' };
+// Table 8.10.6.1.2 — Residential Upright & Pendent
+const TABLE_RES_UPRIGHT = [
+  { minA: 0,   maxB: 0  },
+  { minA: 12,  maxB: 0  },
+  { minA: 18,  maxB: 1  },
+  { minA: 24,  maxB: 1  },
+  { minA: 30,  maxB: 1  },
+  { minA: 36,  maxB: 3  },
+  { minA: 42,  maxB: 3  },
+  { minA: 48,  maxB: 5  },
+  { minA: 54,  maxB: 7  },
+  { minA: 60,  maxB: 7  },
+  { minA: 66,  maxB: 7  },
+  { minA: 72,  maxB: 9  },
+  { minA: 78,  maxB: 11 },
+  { minA: 84,  maxB: 14 },
+];
+
+// Table 8.10.7.1.3 — Residential Sidewall (general obstructions)
+// Minimum A = 8 ft (96 in); "Less than 8 ft — Not allowed"
+const TABLE_RES_SW = [
+  { minA: 96,  maxB: 1  },
+  { minA: 120, maxB: 2  },
+  { minA: 132, maxB: 3  },
+  { minA: 144, maxB: 4  },
+  { minA: 156, maxB: 6  },
+  { minA: 168, maxB: 7  },
+  { minA: 180, maxB: 9  },
+  { minA: 192, maxB: 11 },
+  { minA: 204, maxB: 14 },
+];
+
+// Table 8.10.7.1.4 — Residential Sidewall Along-Wall obstructions
+const TABLE_RES_SW_ALONG_WALL = [
+  { minA: 0,  maxB: 0  },
+  { minA: 18, maxB: 1  },
+  { minA: 36, maxB: 3  },
+  { minA: 48, maxB: 5  },
+  { minA: 54, maxB: 7  },
+  { minA: 72, maxB: 9  },
+  { minA: 78, maxB: 11 },
+  { minA: 84, maxB: 14 },
+];
+
+// Reverse lookup: given B (inches), return minimum A (inches)
+function lookupMinA(table, bInches) {
   for (const row of table) {
-    if (row.maxB >= bInches) return { minA: row.minA, special: null };
+    if (row.maxB >= bInches) return row.minA;
   }
   return null;
 }
@@ -927,7 +1035,7 @@ function lookupUprightSpacing(hazard, construction, sysType) {
     if (construction === 'cb_unob_lt3ft') return { maxArea: 130, maxSpacing: 15, minSpacing: 6, code: 'Table 8.6.2.2.1(a)' };
     if (construction === 'cb_ob_3ft')     return { maxArea: 168, maxSpacing: 15, minSpacing: 6, code: 'Table 8.6.2.2.1(a)' };
     if (construction === 'cb_ob_lt3ft')   return { maxArea: 130, maxSpacing: 15, minSpacing: 6, code: 'Table 8.6.2.2.1(a)' };
-    if (construction === 'concealed')     return { maxArea: 120, maxSpacing: '15 (slope) / 10 (⊥ slope)', minSpacing: 6, code: 'Table 8.6.2.2.1(a) · See § 8.6.4.1.4' };
+    if (construction === 'concealed')     return { maxArea: 120, maxSpacing: '15 (slope) / 10 (\u22a5 slope)', minSpacing: 6, code: 'Table 8.6.2.2.1(a) \u00b7 See \u00a7 8.6.4.1.4' };
   }
   if (hazard === 'ordinary') return { maxArea: 130, maxSpacing: 15, minSpacing: 6, code: 'Table 8.6.2.2.1(b)' };
   if (hazard === 'extra') {
@@ -961,32 +1069,90 @@ function lookupSidewallSpacing(hazard, ceil) {
 // ═══════════════════════════════════════════════════
 function fmtInches(totalIn) {
   if (totalIn === 0) return '0 in';
-  const ft = Math.floor(totalIn / 12);
-  const inches = totalIn % 12;
-  if (ft === 0) return `${inches} in`;
-  if (inches === 0) return `${ft} ft`;
-  const inStr = Number.isInteger(inches) ? inches : inches.toFixed(1);
-  return `${ft} ft ${inStr} in`;
+  const ft  = Math.floor(totalIn / 12);
+  const rem = totalIn % 12;
+  const remStr = Number.isInteger(rem) ? String(rem) : rem.toFixed(2);
+  if (ft === 0) return remStr + ' in';
+  if (rem === 0) return ft + ' ft';
+  return ft + ' ft ' + remStr + ' in';
 }
 
+function show(id) { const el = document.getElementById(id); if(el) el.classList.remove('hidden'); }
+function hide(id) { const el = document.getElementById(id); if(el) el.classList.add('hidden'); }
+
 // ═══════════════════════════════════════════════════
-// OBSTRUCTION UI CONTROLS
+// OBSTRUCTION UI — PROGRESSIVE REVEAL
 // ═══════════════════════════════════════════════════
 function setCoverage(val) {
   state.obs.coverage = val;
   document.getElementById('btn-cov-std').classList.toggle('active', val === 'standard');
   document.getElementById('btn-cov-ext').classList.toggle('active', val === 'extended');
+  document.getElementById('btn-cov-res').classList.toggle('active', val === 'residential');
+  show('obs-sec-2');
   updateObsPrompt();
   clearObsResult();
 }
 
 function setOrientation(val) {
-  state.obs.orient = val;
+  state.obs.orient      = val;
+  state.obs.swObsOrient = null;
+  state.obs.obsType     = null;
+  state.obs.bIn         = 0;
+  state.obs.obsDim      = 0;
+  document.getElementById('val-b-in').textContent    = '0';
+  document.getElementById('val-obs-dim').textContent = '0';
+  ['btn-sw-along','btn-sw-vert','btn-sw-horiz','btn-obs-header','btn-obs-soffit'].forEach(
+    id => document.getElementById(id).classList.remove('active'));
+
   document.getElementById('btn-orient-up').classList.toggle('active', val === 'upright');
   document.getElementById('btn-orient-pd').classList.toggle('active', val === 'pendant');
   document.getElementById('btn-orient-sw').classList.toggle('active', val === 'sidewall');
-  updateObsPrompt();
+
+  if (val === 'sidewall') {
+    show('obs-sec-sw-orient');
+    hide('obs-sec-dist');
+    hide('obs-sec-dim');
+    hide('obs-sec-obstype');
+  } else {
+    hide('obs-sec-sw-orient');
+    document.getElementById('dist-badge').textContent = '3';
+    show('obs-sec-dist');
+    hide('obs-sec-dim');
+    show('obs-sec-obstype');
+  }
   clearObsResult();
+  updateObsPrompt();
+}
+
+function setSWObsOrient(val) {
+  state.obs.swObsOrient = val;
+  state.obs.bIn   = 0;
+  state.obs.obsDim = 0;
+  document.getElementById('val-b-in').textContent    = '0';
+  document.getElementById('val-obs-dim').textContent = '0';
+
+  document.getElementById('btn-sw-along').classList.toggle('active', val === 'along_wall');
+  document.getElementById('btn-sw-vert').classList.toggle('active',  val === 'vertical');
+  document.getElementById('btn-sw-horiz').classList.toggle('active', val === 'horizontal');
+
+  const isResidential = state.obs.coverage === 'residential';
+
+  if (val === 'along_wall') {
+    document.getElementById('dist-badge').textContent = '4';
+    show('obs-sec-dist');
+    hide('obs-sec-dim');
+  } else if (isResidential) {
+    // Residential vertical/horizontal uses B (deflector height) not obstruction dimension
+    document.getElementById('dist-badge').textContent = '4';
+    show('obs-sec-dist');
+    hide('obs-sec-dim');
+  } else {
+    // Standard/Extended: vertical/horizontal uses obstruction dimension
+    hide('obs-sec-dist');
+    show('obs-sec-dim');
+  }
+  clearObsResult();
+  updateObsPrompt();
 }
 
 function setObstruction(val) {
@@ -999,23 +1165,28 @@ function setObstruction(val) {
 
 function updateObsPrompt() {
   const o = state.obs;
-
-  const covEl    = document.getElementById('prompt-coverage');
-  const orientEl = document.getElementById('prompt-orient');
-  const bEl      = document.getElementById('prompt-b');
-  const obsEl    = document.getElementById('prompt-obs');
-
-  if (o.coverage) { covEl.textContent = o.coverage; covEl.classList.remove('empty'); }
-  else            { covEl.textContent = 'coverage';  covEl.classList.add('empty'); }
-
-  if (o.orient) { orientEl.textContent = o.orient; orientEl.classList.remove('empty'); }
-  else          { orientEl.textContent = 'orientation'; orientEl.classList.add('empty'); }
-
-  if (o.bIn > 0) { bEl.textContent = o.bIn + ' in'; bEl.classList.remove('empty'); }
-  else           { bEl.textContent = '?'; bEl.classList.add('empty'); }
-
-  if (o.obsType) { obsEl.textContent = o.obsType; obsEl.classList.remove('empty'); }
-  else           { obsEl.textContent = 'obstruction'; obsEl.classList.add('empty'); }
+  let sentence = '';
+  if (!o.coverage) {
+    sentence = 'Select options below to build your scenario.';
+  } else if (!o.orient) {
+    sentence = 'A <strong>' + o.coverage + '</strong> ___ sprinkler — select orientation.';
+  } else if (o.orient === 'sidewall') {
+    if (!o.swObsOrient) {
+      sentence = 'A <strong>' + o.coverage + ' sidewall</strong> sprinkler — select obstruction orientation.';
+    } else if (o.swObsOrient === 'along_wall') {
+      const b = o.bIn > 0 ? '<strong>' + o.bIn + ' in</strong>' : '<em>?</em>';
+      sentence = 'A <strong>' + o.coverage + ' sidewall</strong> sprinkler is ' + b + ' above the bottom of an <strong>along-wall</strong> obstruction.';
+    } else {
+      const dim  = o.obsDim > 0 ? '<strong>' + o.obsDim + ' in</strong>' : '<em>?</em>';
+      const type = o.swObsOrient === 'vertical' ? 'vertical' : 'horizontal';
+      sentence = 'A <strong>' + o.coverage + ' sidewall</strong> sprinkler near a <strong>' + type + '</strong> obstruction with max dimension ' + dim + '.';
+    }
+  } else {
+    const b   = o.bIn > 0 ? '<strong>' + o.bIn + ' in</strong>' : '<em>?</em>';
+    const obs = o.obsType ? '<strong>' + o.obsType + '</strong>' : '<em>obstruction</em>';
+    sentence  = 'A <strong>' + o.coverage + ' ' + o.orient + '</strong> sprinkler is ' + b + ' above the bottom of a ' + obs + '.';
+  }
+  document.getElementById('prompt-sentence').innerHTML = sentence;
 }
 
 function clearObsResult() {
@@ -1026,86 +1197,130 @@ function clearObsResult() {
 // OBSTRUCTION CALCULATE
 // ═══════════════════════════════════════════════════
 function calculateObstruction() {
-  const o = state.obs;
+  const o        = state.obs;
   const resultEl = document.getElementById('obs-result');
 
-  if (!o.coverage) { flashMissing('btn-cov-std','btn-cov-ext'); return; }
+  if (!o.coverage) { flashMissing('btn-cov-std','btn-cov-ext','btn-cov-res'); return; }
   if (!o.orient)   { flashMissing('btn-orient-up','btn-orient-pd','btn-orient-sw'); return; }
-  if (!o.obsType)  { flashMissing('btn-obs-header','btn-obs-soffit'); return; }
 
-  const bInches = o.bIn;
-  const tableOrient = o.orient === 'sidewall' ? 'sidewall' : 'upright';
-  const result = lookupMinA(tableOrient, bInches);
+  const covLabel  = o.coverage.charAt(0).toUpperCase() + o.coverage.slice(1);
+  const isRes     = o.coverage === 'residential';
 
-  const coverageLabel = o.coverage.charAt(0).toUpperCase() + o.coverage.slice(1);
-  const orientLabel = o.orient === 'sidewall'
-    ? `${coverageLabel} Sidewall (SSW)`
-    : o.orient === 'pendant'
-      ? `${coverageLabel} Pendent (SSP)`
-      : `${coverageLabel} Upright (SSU)`;
-  const codeRef = o.orient === 'sidewall' ? 'NFPA 13–2016 Table 8.7.5.1.3' : 'NFPA 13–2016 Table 8.6.5.1.2';
+  // ── UPRIGHT / PENDANT ─────────────────────────────────
+  if (o.orient !== 'sidewall') {
+    if (!o.obsType) { flashMissing('btn-obs-header','btn-obs-soffit'); return; }
+    const bInches     = o.bIn;
+    const orientLabel = o.orient === 'pendant'
+      ? covLabel + ' Pendent' + (isRes ? '' : ' (SSP)')
+      : covLabel + ' Upright' + (isRes ? '' : ' (SSU)');
 
-  if (result === null) {
-    resultEl.innerHTML = `
-      <div class="result-card fail" style="margin-top:16px">
-        <div class="result-head">
-          <div class="result-icon">⛔</div>
-          <div class="result-status">CANNOT COMPLY</div>
-        </div>
-        <div class="result-body">
-          <div class="result-main">REPOSITION HEAD</div>
-          <div class="result-sub">
-            A deflector height of <strong>${fmtInches(bInches)}</strong> above the ${o.obsType} bottom
-            exceeds the maximum value in the table (35 in for upright/pendent, 14 in for sidewall).
-            The sprinkler must be relocated to a compliant position.
-          </div>
-          <div class="result-code">${codeRef} · ${orientLabel}</div>
-        </div>
-      </div>`;
+    const table   = isRes ? TABLE_RES_UPRIGHT : TABLE_UPRIGHT;
+    const codeRef = isRes
+      ? 'NFPA\u00a013\u20132016 Table 8.10.6.1.2'
+      : 'NFPA\u00a013\u20132016 Table 8.6.5.1.2';
+
+    if (bInches === 0) {
+      resultEl.innerHTML = result_card('pass','\u2705','NO CLEARANCE REQUIRED','ANY DISTANCE',
+        'When the deflector is at the same level as the bottom of the ' + o.obsType +
+        ' (B\u00a0=\u00a00), the obstruction does not restrict horizontal placement.',
+        codeRef + ' \u00b7 ' + orientLabel);
+      return;
+    }
+    const minA = lookupMinA(table, bInches);
+    if (minA === null) {
+      const maxVal = isRes ? '14\u00a0in' : '35\u00a0in';
+      resultEl.innerHTML = result_card('fail','\u26d4','CANNOT COMPLY','REPOSITION HEAD',
+        'A deflector height of <strong>' + bInches + '\u00a0in</strong> exceeds the maximum in the table (' + maxVal + '). Sprinkler must be relocated.',
+        codeRef + ' \u00b7 ' + orientLabel);
+      return;
+    }
+    resultEl.innerHTML = result_card('info','\ud83d\udccf','MINIMUM DISTANCE', fmtInches(minA),
+      'The sprinkler must be at least <strong>' + fmtInches(minA) + '</strong> from the side of the ' +
+      o.obsType + ' when the deflector is <strong>' + bInches + '\u00a0in</strong> above the obstruction bottom.',
+      codeRef + ' \u00b7 ' + orientLabel);
     return;
   }
 
-  if (result.special === 'zero') {
-    resultEl.innerHTML = `
-      <div class="result-card pass" style="margin-top:16px">
-        <div class="result-head">
-          <div class="result-icon">✅</div>
-          <div class="result-status">NO CLEARANCE REQUIRED</div>
-        </div>
-        <div class="result-body">
-          <div class="result-main">ANY DISTANCE</div>
-          <div class="result-sub">
-            When the deflector is at the same level as the bottom of the ${o.obsType} (B = 0),
-            the obstruction does not restrict horizontal placement per Table 8.6.5.1.2.
-          </div>
-          <div class="result-code">${codeRef} · ${orientLabel}</div>
-        </div>
-      </div>`;
+  // ── SIDEWALL ──────────────────────────────────────────
+  if (!o.swObsOrient) { flashMissing('btn-sw-along','btn-sw-vert','btn-sw-horiz'); return; }
+  const orientLabel = covLabel + ' Sidewall' + (isRes ? '' : ' (SSW)');
+
+  // Along the wall
+  if (o.swObsOrient === 'along_wall') {
+    const bInches = o.bIn;
+    const table   = isRes ? TABLE_RES_SW_ALONG_WALL : TABLE_SW_ALONG_WALL;
+    const codeRef = isRes
+      ? 'NFPA\u00a013\u20132016 Table 8.10.7.1.4'
+      : 'NFPA\u00a013\u20132016 Table 8.7.5.1.4';
+    const minA = lookupMinA(table, bInches);
+    if (minA === null) {
+      const maxVal = isRes ? '14\u00a0in' : '17.5\u00a0in';
+      resultEl.innerHTML = result_card('fail','\u26d4','CANNOT COMPLY','REPOSITION HEAD',
+        'A deflector height of <strong>' + bInches + '\u00a0in</strong> exceeds the maximum in the table (' + maxVal + '). Sprinkler must be relocated.',
+        codeRef + ' \u00b7 ' + orientLabel);
+      return;
+    }
+    resultEl.innerHTML = result_card('info','\ud83d\udccf','MINIMUM DISTANCE', fmtInches(minA),
+      'The sidewall sprinkler must be at least <strong>' + fmtInches(minA) + '</strong> from the along-wall obstruction when the deflector is <strong>' + bInches + '\u00a0in</strong> above the obstruction bottom.',
+      codeRef + ' \u00b7 ' + orientLabel);
     return;
   }
 
-  const minAFmt = fmtInches(result.minA);
-  resultEl.innerHTML = `
-    <div class="result-card info" style="margin-top:16px">
-      <div class="result-head">
-        <div class="result-icon">📏</div>
-        <div class="result-status">MINIMUM DISTANCE</div>
-      </div>
-      <div class="result-body">
-        <div class="result-main">${minAFmt}</div>
-        <div class="result-sub">
-          The sprinkler must be positioned at least <strong>${minAFmt}</strong> from the side of the
-          ${o.obsType} when the deflector is <strong>${fmtInches(bInches)}</strong>
-          above the bottom of the obstruction.
-        </div>
-        <div class="result-code">${codeRef} · ${orientLabel}</div>
-      </div>
-    </div>`;
+  // Vertical or Horizontal — Residential uses Table 8.10.7.1.3 (B input)
+  if (isRes) {
+    const bInches = o.bIn;
+    const codeRef = 'NFPA\u00a013\u20132016 Table 8.10.7.1.3';
+    if (o.swObsOrient === 'vertical' || o.swObsOrient === 'horizontal') {
+      const minA = lookupMinA(TABLE_RES_SW, bInches);
+      if (minA === null) {
+        resultEl.innerHTML = result_card('fail','\u26d4','CANNOT COMPLY','REPOSITION HEAD',
+          'A deflector height of <strong>' + bInches + '\u00a0in</strong> exceeds the maximum in the table (14\u00a0in). Minimum obstruction distance requires less than 8\u00a0ft\u00a0clearance — sprinkler must be relocated per manufacturer instructions.',
+          codeRef + ' \u00b7 ' + orientLabel);
+        return;
+      }
+      const notAllowed = bInches >= 0 && minA === 96;
+      const noteText = o.swObsOrient === 'vertical'
+        ? 'Residential sidewall sprinklers shall not be installed closer than 8\u00a0ft (96\u00a0in) from any obstruction per \u00a7\u00a08.10.7.1.2.'
+        : 'Per \u00a7\u00a08.10.7.1.2, residential sidewall sprinklers shall not be installed closer than 8\u00a0ft from light fixtures or similar obstructions.';
+      resultEl.innerHTML = result_card('info','\ud83d\udccf','MINIMUM DISTANCE', fmtInches(minA),
+        'The residential sidewall sprinkler must be at least <strong>' + fmtInches(minA) + '</strong> from the ' +
+        o.swObsOrient + ' obstruction when the deflector is <strong>' + bInches + '\u00a0in</strong> above the obstruction bottom. ' + noteText,
+        codeRef + ' \u00b7 ' + orientLabel);
+      return;
+    }
+  }
+
+  // Vertical or Horizontal — Standard/Extended uses 3×D formula
+  const dim = o.obsDim;
+  if (dim === 0) { flashMissing('field-obs-dim'); return; }
+  const isHoriz = o.swObsOrient === 'horizontal';
+  const raw     = 3 * dim;
+  const minA    = isHoriz ? Math.min(raw, 24) : raw;
+  const codeRef = isHoriz
+    ? 'NFPA\u00a013\u20132016 \u00a7\u00a08.7.5.2.1.3(b)'
+    : 'NFPA\u00a013\u20132016 \u00a7\u00a08.7.5.2.1.3(a)';
+  const capNote = (isHoriz && raw > 24)
+    ? ' (capped at 24\u00a0in per \u00a7\u00a08.7.5.2.1.3(b))'
+    : '';
+  resultEl.innerHTML = result_card('info','\ud83d\udccf','MINIMUM DISTANCE', fmtInches(minA),
+    'The sidewall sprinkler must be at least <strong>' + fmtInches(minA) + '</strong> from the ' +
+    o.swObsOrient + ' obstruction. Calculated as 3 \u00d7 ' + dim + '\u00a0in = ' + raw + '\u00a0in' + capNote + '.',
+    codeRef + ' \u00b7 ' + orientLabel);
+}
+
+function result_card(type, icon, status, main, sub, code) {
+  return '<div class="result-card ' + type + '" style="margin-top:16px">' +
+    '<div class="result-head"><div class="result-icon">' + icon + '</div>' +
+    '<div class="result-status">' + status + '</div></div>' +
+    '<div class="result-body"><div class="result-main">' + main + '</div>' +
+    '<div class="result-sub">' + sub + '</div>' +
+    '<div class="result-code">' + code + '</div></div></div>';
 }
 
 function flashMissing(...ids) {
   ids.forEach(id => {
     const el = document.getElementById(id);
+    if (!el) return;
     el.style.outline = '2px solid var(--red)';
     setTimeout(() => el.style.outline = '', 1200);
   });
