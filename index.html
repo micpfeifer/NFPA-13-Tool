@@ -1,0 +1,1237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>NFPA 13 Field Tool</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0a0a0a;
+  --card: #141414;
+  --card2: #1c1c1c;
+  --border: #2a2a2a;
+  --border2: #383838;
+  --orange: #f55f00;
+  --orange2: #ff7722;
+  --orange-dim: rgba(245,95,0,0.12);
+  --green: #15803d;
+  --green-bg: rgba(21,128,61,0.15);
+  --red: #dc2626;
+  --red-bg: rgba(220,38,38,0.15);
+  --text: #f2f2f2;
+  --text2: #999;
+  --text3: #555;
+  --radius: 12px;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;overflow:hidden;}
+body{
+  font-family:'Barlow',sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  display:flex;flex-direction:column;
+  height:100dvh;
+  overflow:hidden;
+}
+
+/* ── SCROLLABLE WRAPPER ── */
+.screen{
+  display:none;flex-direction:column;
+  height:100dvh;overflow-y:auto;overflow-x:hidden;
+  padding:0 0 40px;
+}
+.screen.active{display:flex;}
+
+/* ── TOP BAR ── */
+.topbar{
+  position:sticky;top:0;z-index:10;
+  background:var(--bg);
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:12px;
+  padding:14px 16px;
+  flex-shrink:0;
+}
+.topbar .back{
+  background:var(--card);border:1px solid var(--border);
+  color:var(--text2);font-size:20px;
+  width:40px;height:40px;border-radius:8px;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;flex-shrink:0;
+}
+.topbar .back:active{background:var(--card2);}
+.topbar .title{
+  font-family:'Bebas Neue',cursive;
+  font-size:22px;letter-spacing:1px;
+  color:var(--text);line-height:1;
+}
+.topbar .subtitle{
+  font-size:11px;color:var(--text3);
+  font-weight:500;letter-spacing:0.5px;
+  text-transform:uppercase;
+  margin-top:2px;
+}
+
+/* ── HOME SCREEN ── */
+.home-header{
+  padding:40px 20px 24px;
+  text-align:center;
+  flex-shrink:0;
+}
+.home-header .logo{
+  font-family:'Bebas Neue',cursive;
+  font-size:52px;letter-spacing:3px;
+  color:var(--orange);
+  line-height:1;
+}
+.home-header .logo span{color:var(--text);}
+.home-header .edition{
+  font-size:11px;font-weight:600;letter-spacing:2px;
+  text-transform:uppercase;color:var(--text3);
+  margin-top:4px;
+}
+.home-header .tagline{
+  font-size:14px;color:var(--text2);
+  margin-top:10px;line-height:1.5;
+}
+.home-cards{
+  padding:0 16px;
+  display:flex;flex-direction:column;gap:14px;
+  flex:1;
+}
+.home-btn{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  padding:28px 24px;
+  cursor:pointer;
+  display:flex;align-items:center;gap:20px;
+  transition:border-color 0.15s,background 0.15s;
+  text-align:left;
+  width:100%;
+}
+.home-btn:active{background:var(--card2);border-color:var(--border2);}
+.home-btn .icon{
+  font-size:36px;flex-shrink:0;
+  width:56px;height:56px;
+  background:var(--orange-dim);border-radius:10px;
+  display:flex;align-items:center;justify-content:center;
+}
+.home-btn .btn-text .label{
+  font-family:'Bebas Neue',cursive;
+  font-size:26px;letter-spacing:1px;
+  color:var(--text);
+}
+.home-btn .btn-text .desc{
+  font-size:13px;color:var(--text2);
+  margin-top:3px;line-height:1.4;
+}
+.home-btn .arrow{
+  margin-left:auto;color:var(--text3);font-size:20px;flex-shrink:0;
+}
+.home-footer{
+  padding:20px 16px;
+  text-align:center;
+  font-size:11px;color:var(--text3);
+  letter-spacing:0.3px;
+}
+
+/* ── SECTION CARDS ── */
+.section{
+  margin:16px 16px 0;
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+}
+.section-head{
+  padding:14px 16px 12px;
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:10px;
+}
+.step-badge{
+  width:24px;height:24px;
+  background:var(--orange);
+  border-radius:50%;
+  font-size:12px;font-weight:700;
+  display:flex;align-items:center;justify-content:center;
+  color:#fff;flex-shrink:0;
+}
+.section-head .sec-label{
+  font-size:11px;font-weight:700;
+  text-transform:uppercase;letter-spacing:1px;
+  color:var(--text2);
+}
+.section-body{
+  display:block;
+  padding:14px 16px;
+}
+
+/* ── TOGGLE GROUP ── */
+.toggle-group{
+  display:flex;
+  flex-direction:row;
+  gap:8px;
+  width:100%;
+}
+.toggle-btn{
+  -webkit-appearance:none;
+  appearance:none;
+  flex:1;
+  min-width:0;
+  min-height:56px;
+  border:1px solid var(--border);
+  background:var(--card2);
+  color:var(--text2);
+  border-radius:8px;
+  padding:14px 8px;
+  font-family:'Bebas Neue',cursive;
+  font-size:18px;letter-spacing:0.5px;
+  cursor:pointer;
+  text-align:center;
+  transition:border-color 0.15s,background 0.15s,color 0.15s;
+  line-height:1.2;
+  display:inline-block;
+}
+.toggle-btn small{
+  display:block;
+  font-family:'Barlow',sans-serif;
+  font-size:10px;font-weight:600;
+  letter-spacing:0.5px;
+  text-transform:uppercase;
+  opacity:0.6;margin-top:2px;
+}
+.toggle-btn.active{
+  background:var(--orange-dim);
+  border-color:var(--orange);
+  color:var(--orange2);
+}
+.toggle-btn:active{opacity:0.7;}
+
+/* ── DISTANCE INPUT ── */
+.dist-row{
+  display:flex;gap:10px;align-items:center;
+}
+.dist-col{flex:1;}
+.dist-label{
+  font-size:10px;font-weight:700;
+  text-transform:uppercase;letter-spacing:1px;
+  color:var(--text3);margin-bottom:6px;
+}
+.stepper{
+  display:flex;align-items:center;
+  background:var(--card2);
+  border:1px solid var(--border);
+  border-radius:8px;
+  overflow:hidden;
+}
+.stepper button{
+  background:none;border:none;
+  color:var(--orange2);
+  font-size:22px;font-weight:700;
+  width:48px;height:52px;
+  cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+  user-select:none;
+}
+.stepper button:active{background:var(--border);}
+.stepper .val{
+  flex:1;text-align:center;
+  font-family:'Bebas Neue',cursive;
+  font-size:26px;letter-spacing:1px;
+  color:var(--text);
+  user-select:none;
+}
+.stepper .unit{
+  font-family:'Barlow',sans-serif;
+  font-size:12px;font-weight:600;
+  color:var(--text3);
+  text-transform:uppercase;
+  letter-spacing:0.5px;
+  padding-right:10px;
+  flex-shrink:0;
+}
+
+/* ── PROMPT DISPLAY ── */
+.prompt-card{
+  margin:16px 16px 0;
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  padding:16px;
+}
+.prompt-card .prompt-label{
+  font-size:10px;font-weight:700;
+  text-transform:uppercase;letter-spacing:1.5px;
+  color:var(--orange);margin-bottom:10px;
+}
+.prompt-text{
+  font-size:15px;font-weight:500;
+  line-height:1.8;color:var(--text2);
+}
+.prompt-text .blank{
+  display:inline-block;
+  color:var(--orange2);
+  font-weight:700;
+  border-bottom:1.5px solid var(--orange);
+  padding:0 4px;
+  min-width:60px;
+  text-align:center;
+  font-style:italic;
+}
+.prompt-text .blank.empty{
+  color:var(--text3);
+  border-bottom-color:var(--text3);
+}
+
+/* ── KEYPAD TRIGGER FIELDS ── */
+.dist-row{
+  display:flex;gap:10px;
+}
+.dist-col{flex:1;}
+.dist-label{
+  font-size:10px;font-weight:700;
+  text-transform:uppercase;letter-spacing:1px;
+  color:var(--text3);margin-bottom:6px;
+}
+.dist-field{
+  background:var(--card2);
+  border:1px solid var(--border);
+  border-radius:8px;
+  padding:14px 14px;
+  display:flex;align-items:center;justify-content:space-between;
+  cursor:pointer;
+  transition:border-color 0.15s;
+  user-select:none;
+}
+.dist-field:active{border-color:var(--orange);}
+.dist-field.active-field{border-color:var(--orange);background:var(--orange-dim);}
+.dist-field .df-val{
+  font-family:'Bebas Neue',cursive;
+  font-size:30px;letter-spacing:1px;
+  color:var(--text);line-height:1;
+}
+.dist-field .df-unit{
+  font-size:11px;font-weight:700;
+  text-transform:uppercase;letter-spacing:1px;
+  color:var(--text3);
+}
+
+/* ── KEYPAD OVERLAY ── */
+.kp-overlay{
+  display:none;
+  position:fixed;inset:0;z-index:100;
+  background:rgba(0,0,0,0.7);
+  backdrop-filter:blur(2px);
+  align-items:flex-end;
+}
+.kp-overlay.open{display:flex;}
+.kp-sheet{
+  width:100%;
+  background:#1a1a1a;
+  border-top:1px solid var(--border2);
+  border-radius:20px 20px 0 0;
+  padding:0 0 env(safe-area-inset-bottom,0);
+  transform:translateY(100%);
+  transition:transform 0.25s cubic-bezier(0.32,0.72,0,1);
+}
+.kp-overlay.open .kp-sheet{transform:translateY(0);}
+
+.kp-header{
+  padding:16px 20px 12px;
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+}
+.kp-field-label{
+  font-size:11px;font-weight:700;
+  text-transform:uppercase;letter-spacing:1.5px;
+  color:var(--orange);
+}
+.kp-display{
+  font-family:'Bebas Neue',cursive;
+  font-size:42px;letter-spacing:2px;
+  color:var(--text);line-height:1;
+  min-width:60px;text-align:right;
+}
+.kp-hint{
+  font-size:11px;color:var(--text3);
+  margin-top:3px;
+}
+
+.kp-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:1px;
+  background:var(--border);
+  border-top:1px solid var(--border);
+}
+.kp-key{
+  background:#1a1a1a;
+  border:none;
+  color:var(--text);
+  font-family:'Bebas Neue',cursive;
+  font-size:26px;letter-spacing:1px;
+  padding:20px 10px;
+  cursor:pointer;
+  text-align:center;
+  transition:background 0.1s;
+  -webkit-tap-highlight-color:transparent;
+}
+.kp-key:active{background:var(--card2);}
+.kp-key.kp-back{
+  font-size:22px;color:var(--text2);
+}
+.kp-key.kp-ok{
+  background:var(--orange);
+  color:#fff;
+  font-size:22px;letter-spacing:2px;
+}
+.kp-key.kp-ok:active{background:var(--orange2);}
+
+/* ── CALCULATE BUTTON ── */
+.calc-btn{
+  margin:16px 16px 0;
+  width:calc(100% - 32px);
+  background:var(--orange);
+  border:none;
+  border-radius:var(--radius);
+  padding:18px;
+  font-family:'Bebas Neue',cursive;
+  font-size:22px;letter-spacing:2px;
+  color:#fff;
+  cursor:pointer;
+  transition:background 0.15s;
+  display:flex;align-items:center;justify-content:center;gap:10px;
+}
+.calc-btn:active{background:var(--orange2);}
+.calc-btn:disabled{background:var(--text3);cursor:not-allowed;}
+
+/* ── RESULT CARD ── */
+.result-card{
+  margin:16px 16px 0;
+  border-radius:var(--radius);
+  overflow:hidden;
+  border:1.5px solid;
+}
+.result-card.pass{
+  background:var(--green-bg);
+  border-color:var(--green);
+}
+.result-card.fail{
+  background:var(--red-bg);
+  border-color:var(--red);
+}
+.result-card.info{
+  background:var(--orange-dim);
+  border-color:var(--orange);
+}
+.result-head{
+  padding:14px 16px 12px;
+  display:flex;align-items:center;gap:10px;
+  border-bottom:1px solid rgba(255,255,255,0.07);
+}
+.result-icon{font-size:22px;}
+.result-status{
+  font-family:'Bebas Neue',cursive;
+  font-size:20px;letter-spacing:1px;
+}
+.result-card.pass .result-status{color:#4ade80;}
+.result-card.fail .result-status{color:#f87171;}
+.result-card.info .result-status{color:var(--orange2);}
+.result-body{padding:14px 16px;}
+.result-main{
+  font-family:'Bebas Neue',cursive;
+  font-size:36px;letter-spacing:1px;
+  line-height:1;color:var(--text);
+}
+.result-sub{
+  font-size:13px;color:var(--text2);
+  margin-top:6px;line-height:1.5;
+}
+.result-code{
+  font-size:11px;font-weight:600;
+  text-transform:uppercase;letter-spacing:0.8px;
+  margin-top:10px;
+  padding-top:10px;
+  border-top:1px solid rgba(255,255,255,0.07);
+  color:var(--text3);
+}
+
+/* ── SPACING RESULTS TABLE ── */
+.result-table{
+  width:100%;border-collapse:collapse;
+  margin-top:4px;
+}
+.result-table td{
+  padding:7px 0;
+  border-bottom:1px solid rgba(255,255,255,0.06);
+  font-size:14px;
+}
+.result-table td:first-child{color:var(--text2);}
+.result-table td:last-child{
+  text-align:right;
+  font-weight:700;
+  font-family:'Bebas Neue',cursive;
+  font-size:18px;letter-spacing:0.5px;
+  color:var(--orange2);
+}
+.result-table tr:last-child td{border-bottom:none;}
+
+/* ── DROP-DOWN SELECT ── */
+.select-wrap{position:relative;}
+.select-wrap select{
+  width:100%;
+  background:var(--card2);
+  border:1px solid var(--border);
+  border-radius:8px;
+  color:var(--text);
+  font-family:'Barlow',sans-serif;
+  font-size:15px;font-weight:500;
+  padding:14px 40px 14px 14px;
+  appearance:none;
+  cursor:pointer;
+  -webkit-appearance:none;
+}
+.select-wrap::after{
+  content:"▾";
+  position:absolute;right:14px;top:50%;
+  transform:translateY(-50%);
+  color:var(--text2);pointer-events:none;font-size:16px;
+}
+.select-wrap select:focus{outline:2px solid var(--orange);outline-offset:-2px;}
+
+/* ── WARNING BOX ── */
+.warn-box{
+  margin:10px 16px 0;
+  padding:10px 14px;
+  background:rgba(220,38,38,0.1);
+  border:1px solid var(--red);
+  border-radius:8px;
+  font-size:12px;color:#fca5a5;
+  line-height:1.5;
+  display:none;
+}
+.warn-box.visible{display:block;}
+
+/* ── DIVIDER ── */
+.divider{
+  text-align:center;font-size:11px;
+  color:var(--text3);letter-spacing:1px;
+  text-transform:uppercase;
+  margin:12px 16px 0;
+  display:flex;align-items:center;gap:10px;
+}
+.divider::before,.divider::after{
+  content:"";flex:1;height:1px;background:var(--border);
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════ HOME ═══════════════════════════════ -->
+<div class="screen active" id="screen-home">
+  <div class="home-header">
+    <div class="logo"><span>NFPA</span> 13</div>
+    <div class="edition">2016 Edition · Chapter 8</div>
+    <div class="tagline">Field reference tool for sprinkler<br>fitters and layout technicians</div>
+  </div>
+  <div class="home-cards">
+    <button class="home-btn" onclick="goTo('screen-obstruction')">
+      <div class="icon">🚫</div>
+      <div class="btn-text">
+        <div class="label">Obstructions</div>
+        <div class="desc">Determine minimum clearance distance from headers, soffits &amp; structural members</div>
+      </div>
+      <div class="arrow">›</div>
+    </button>
+    <button class="home-btn" onclick="goTo('screen-spacing')">
+      <div class="icon">📐</div>
+      <div class="btn-text">
+        <div class="label">Head Spacing</div>
+        <div class="desc">Max protection area &amp; spacing for standard pendent, upright, and sidewall sprinklers</div>
+      </div>
+      <div class="arrow">›</div>
+    </button>
+  </div>
+  <div class="home-footer">Standard &amp; Extended Coverage · NFPA 13–2016</div>
+</div>
+
+<!-- ═══════════════════════════════ OBSTRUCTIONS ═══════════════════════ -->
+<div class="screen" id="screen-obstruction">
+  <div class="topbar">
+    <div class="back" onclick="goTo('screen-home')">‹</div>
+    <div>
+      <div class="title">Obstructions</div>
+      <div class="subtitle">NFPA-13 2016 Edition</div>
+    </div>
+  </div>
+
+  <!-- Live Prompt -->
+  <div class="prompt-card">
+    <div class="prompt-label">Active Scenario</div>
+    <div class="prompt-text">
+      A
+      <span class="blank empty" id="prompt-coverage">coverage</span>
+      <span class="blank empty" id="prompt-orient">orientation</span>
+      sprinkler is
+      <span class="blank empty" id="prompt-b">?</span>
+      above the bottom of a
+      <span class="blank empty" id="prompt-obs">obstruction</span>.
+    </div>
+  </div>
+
+  <!-- Step 1: Coverage Type -->
+  <div class="section">
+    <div class="section-head">
+      <div class="step-badge">1</div>
+      <div class="sec-label">Coverage Type</div>
+    </div>
+    <div class="section-body">
+      <div class="toggle-group">
+        <button class="toggle-btn" id="btn-cov-std" onclick="setCoverage('standard')">
+          STANDARD<br><small>SSU · SSP · SSW</small>
+        </button>
+        <button class="toggle-btn" id="btn-cov-ext" onclick="setCoverage('extended')">
+          EXTENDED<br><small>ECU · ECP · ECSW</small>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Step 2: Orientation -->
+  <div class="section">
+    <div class="section-head">
+      <div class="step-badge">2</div>
+      <div class="sec-label">Sprinkler Orientation</div>
+    </div>
+    <div class="section-body">
+      <div class="toggle-group">
+        <button class="toggle-btn" id="btn-orient-up" onclick="setOrientation('upright')">
+          UPRIGHT<br><small>SSU</small>
+        </button>
+        <button class="toggle-btn" id="btn-orient-pd" onclick="setOrientation('pendant')">
+          PENDANT<br><small>SSP</small>
+        </button>
+        <button class="toggle-btn" id="btn-orient-sw" onclick="setOrientation('sidewall')">
+          SIDEWALL<br><small>SSW</small>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Step 3: Distance B -->
+  <div class="section">
+    <div class="section-head">
+      <div class="step-badge">3</div>
+      <div class="sec-label">Deflector Height Above Obstruction Bottom</div>
+    </div>
+    <div class="section-body">
+      <div class="dist-field" id="field-b-in" onclick="openKeypad()" style="max-width:180px">
+        <div class="df-val" id="val-b-in">0</div>
+        <div class="df-unit">inches ▸</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Step 4: Obstruction Type -->
+  <div class="section">
+    <div class="section-head">
+      <div class="step-badge">4</div>
+      <div class="sec-label">Obstruction Type</div>
+    </div>
+    <div class="section-body">
+      <div class="toggle-group">
+        <button class="toggle-btn" id="btn-obs-header" onclick="setObstruction('header')">
+          HEADER<br><small>Structural beam</small>
+        </button>
+        <button class="toggle-btn" id="btn-obs-soffit" onclick="setObstruction('soffit')">
+          SOFFIT<br><small>Enclosed ledge</small>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Calculate -->
+  <button class="calc-btn" id="calc-obs-btn" onclick="calculateObstruction()">
+    ⚡ Calculate Minimum Distance
+  </button>
+
+  <!-- Result -->
+  <div id="obs-result"></div>
+  <div style="height:20px"></div>
+</div>
+
+<!-- ═══════════════════════════════ SPACING ════════════════════════════ -->
+<div class="screen" id="screen-spacing">
+  <div class="topbar">
+    <div class="back" onclick="goTo('screen-home')">‹</div>
+    <div>
+      <div class="title">Head Spacing</div>
+      <div class="subtitle">NFPA 13 § 8.6 / § 8.7</div>
+    </div>
+  </div>
+
+  <!-- Step 1: Orientation -->
+  <div class="section">
+    <div class="section-head">
+      <div class="step-badge">1</div>
+      <div class="sec-label">Sprinkler Orientation</div>
+    </div>
+    <div class="section-body">
+      <div class="toggle-group">
+        <button class="toggle-btn" id="sp-btn-up" onclick="setSpacingOrient('upright')">
+          UPRIGHT<br><small>SSU · Pendant</small>
+        </button>
+        <button class="toggle-btn" id="sp-btn-sw" onclick="setSpacingOrient('sidewall')">
+          SIDEWALL<br><small>SSW</small>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Step 2: Hazard Classification -->
+  <div class="section">
+    <div class="section-head">
+      <div class="step-badge">2</div>
+      <div class="sec-label">Hazard Classification</div>
+    </div>
+    <div class="section-body">
+      <div class="select-wrap">
+        <select id="sp-hazard" onchange="onSpacingHazardChange()">
+          <option value="">— Select Hazard —</option>
+          <option value="light">Light Hazard</option>
+          <option value="ordinary">Ordinary Hazard</option>
+          <option value="extra">Extra Hazard</option>
+          <option value="highpiled">High-Piled Storage</option>
+        </select>
+      </div>
+      <div class="warn-box" id="sw-extra-warn">
+        Sidewall sprinklers are only listed for light and ordinary hazard occupancies per NFPA 13 § 8.4.2.
+      </div>
+    </div>
+  </div>
+
+  <!-- Step 3: Construction Type (Upright/Pendent only) -->
+  <div class="section" id="sp-construction-section" style="display:none">
+    <div class="section-head">
+      <div class="step-badge">3</div>
+      <div class="sec-label">Construction Type</div>
+    </div>
+    <div class="section-body">
+      <div class="select-wrap">
+        <select id="sp-construction">
+          <option value="">— Select Construction —</option>
+          <option value="nc_unob">Noncombustible — Unobstructed</option>
+          <option value="nc_ob">Noncombustible — Obstructed</option>
+          <option value="cb_unob_none">Combustible Unobstructed — No Exposed Members</option>
+          <option value="cb_unob_3ft">Combustible Unobstructed — Exposed Members ≥ 3 ft o.c.</option>
+          <option value="cb_unob_lt3ft">Combustible Unobstructed — Exposed Members &lt; 3 ft o.c.</option>
+          <option value="cb_ob_3ft">Combustible Obstructed — Exposed Members ≥ 3 ft o.c.</option>
+          <option value="cb_ob_lt3ft">Combustible Obstructed — Members &lt; 3 ft o.c.</option>
+          <option value="concealed">Combustible Concealed Space (§ 8.6.4.1.4)</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- Step 3: Ceiling Type (Sidewall only) -->
+  <div class="section" id="sp-ceiling-section" style="display:none">
+    <div class="section-head">
+      <div class="step-badge">3</div>
+      <div class="sec-label">Ceiling Finish</div>
+    </div>
+    <div class="section-body">
+      <div class="toggle-group">
+        <button class="toggle-btn" id="sp-ceil-comb" onclick="setSpacingCeil('combustible')">
+          COMBUSTIBLE<br><small>Wood, etc.</small>
+        </button>
+        <button class="toggle-btn" id="sp-ceil-nc" onclick="setSpacingCeil('noncombustible')">
+          NON-COMB.<br><small>Gypsum, metal</small>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Step 4: System Type (Extra / High-Piled only) -->
+  <div class="section" id="sp-systype-section" style="display:none">
+    <div class="section-head">
+      <div class="step-badge" id="sp-systype-badge">4</div>
+      <div class="sec-label">System Design Type</div>
+    </div>
+    <div class="section-body">
+      <div class="toggle-group">
+        <button class="toggle-btn" id="sp-sys-hc-lo" onclick="setSpacingSys('hc_lo')">
+          HYDRAULIC<br><small>Density &lt; 0.25</small>
+        </button>
+        <button class="toggle-btn" id="sp-sys-hc-hi" onclick="setSpacingSys('hc_hi')">
+          HYDRAULIC<br><small>Density ≥ 0.25</small>
+        </button>
+        <button class="toggle-btn" id="sp-sys-ps" onclick="setSpacingSys('pipe_sched')">
+          PIPE<br><small>Schedule</small>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Calculate -->
+  <button class="calc-btn" id="calc-sp-btn" onclick="calculateSpacing()" style="margin-top:16px">
+    ⚡ Calculate Spacing
+  </button>
+
+  <!-- Result -->
+  <div id="sp-result"></div>
+  <div style="height:20px"></div>
+</div>
+
+
+<!-- ═══════════════════════════════ KEYPAD OVERLAY ════════════════════ -->
+<div class="kp-overlay" id="kp-overlay" onclick="kpOverlayTap(event)">
+  <div class="kp-sheet" id="kp-sheet">
+    <div class="kp-header">
+      <div>
+        <div class="kp-field-label" id="kp-field-label">FEET</div>
+        <div class="kp-hint" id="kp-hint">Tap a number, then OK</div>
+      </div>
+      <div class="kp-display" id="kp-display">0</div>
+    </div>
+    <div class="kp-grid">
+      <button class="kp-key" onclick="kpKey('1')">1</button>
+      <button class="kp-key" onclick="kpKey('2')">2</button>
+      <button class="kp-key" onclick="kpKey('3')">3</button>
+      <button class="kp-key" onclick="kpKey('4')">4</button>
+      <button class="kp-key" onclick="kpKey('5')">5</button>
+      <button class="kp-key" onclick="kpKey('6')">6</button>
+      <button class="kp-key" onclick="kpKey('7')">7</button>
+      <button class="kp-key" onclick="kpKey('8')">8</button>
+      <button class="kp-key" onclick="kpKey('9')">9</button>
+      <button class="kp-key kp-back" onclick="kpKey('back')">⌫</button>
+      <button class="kp-key" onclick="kpKey('0')">0</button>
+      <button class="kp-key kp-ok" onclick="kpKey('ok')">OK</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════
+const state = {
+  obs: { coverage: null, orient: null, bIn: 0, obsType: null },
+  sp:  { orient: null, hazard: null, construction: null, ceil: null, sysType: null }
+};
+
+// ═══════════════════════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════════════════════
+function goTo(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  const el = document.getElementById(id);
+  el.classList.add('active');
+  el.scrollTop = 0;
+}
+
+// ═══════════════════════════════════════════════════
+// KEYPAD
+// ═══════════════════════════════════════════════════
+let kpBuffer = '';
+
+function openKeypad() {
+  kpBuffer = state.obs.bIn === 0 ? '' : String(state.obs.bIn);
+
+  document.getElementById('kp-field-label').textContent = 'INCHES';
+  document.getElementById('kp-hint').textContent = 'Enter total inches above obstruction bottom, then OK';
+  document.getElementById('kp-display').textContent = kpBuffer || '0';
+  document.getElementById('field-b-in').classList.add('active-field');
+
+  document.getElementById('kp-overlay').classList.add('open');
+}
+
+function closeKeypad() {
+  document.getElementById('kp-overlay').classList.remove('open');
+  document.getElementById('field-b-in').classList.remove('active-field');
+  kpBuffer = '';
+}
+
+function kpOverlayTap(e) {
+  if (e.target === document.getElementById('kp-overlay')) closeKeypad();
+}
+
+function kpKey(key) {
+  if (key === 'back') {
+    kpBuffer = kpBuffer.slice(0, -1);
+  } else if (key === 'ok') {
+    const val = Math.max(0, parseInt(kpBuffer) || 0);
+    state.obs.bIn = val;
+    document.getElementById('val-b-in').textContent = val;
+    updateObsPrompt();
+    clearObsResult();
+    closeKeypad();
+    return;
+  } else {
+    if (kpBuffer.length < 3) kpBuffer += key;
+  }
+  document.getElementById('kp-display').textContent = kpBuffer || '0';
+}
+
+// ═══════════════════════════════════════════════════
+// NFPA 13 LOOKUP TABLES
+// ═══════════════════════════════════════════════════
+
+// Table 8.6.5.1.2 — Standard Pendent & Upright (SSU/SSP)
+const TABLE_UPRIGHT = [
+  { minA: 0,   maxB: 0    },
+  { minA: 12,  maxB: 2.5  },
+  { minA: 18,  maxB: 3.5  },
+  { minA: 24,  maxB: 5.5  },
+  { minA: 30,  maxB: 7.5  },
+  { minA: 36,  maxB: 9.5  },
+  { minA: 42,  maxB: 12   },
+  { minA: 48,  maxB: 14   },
+  { minA: 54,  maxB: 16.5 },
+  { minA: 60,  maxB: 18   },
+  { minA: 66,  maxB: 20   },
+  { minA: 72,  maxB: 24   },
+  { minA: 78,  maxB: 30   },
+  { minA: 84,  maxB: 35   },
+];
+
+// Table 8.7.5.1.3 — Standard Sidewall (SSW)
+const TABLE_SIDEWALL = [
+  { minA: 48,  maxB: 1  },
+  { minA: 60,  maxB: 2  },
+  { minA: 66,  maxB: 3  },
+  { minA: 72,  maxB: 4  },
+  { minA: 78,  maxB: 6  },
+  { minA: 84,  maxB: 7  },
+  { minA: 90,  maxB: 9  },
+  { minA: 96,  maxB: 11 },
+  { minA: 102, maxB: 14 },
+];
+
+function lookupMinA(orientation, bInches) {
+  const table = orientation === 'sidewall' ? TABLE_SIDEWALL : TABLE_UPRIGHT;
+  if (orientation !== 'sidewall' && bInches === 0) return { minA: 0, special: 'zero' };
+  for (const row of table) {
+    if (row.maxB >= bInches) return { minA: row.minA, special: null };
+  }
+  return null;
+}
+
+// Table 8.6.2.2.1 — Standard Pendent & Upright Spacing
+function lookupUprightSpacing(hazard, construction, sysType) {
+  if (hazard === 'light') {
+    if (['nc_unob','nc_ob','cb_unob_none','cb_unob_3ft'].includes(construction)) {
+      if (sysType === 'pipe_sched') return { maxArea: 200, maxSpacing: 15, minSpacing: 6, code: 'Table 8.6.2.2.1(a)' };
+      return { maxArea: 225, maxSpacing: 15, minSpacing: 6, code: 'Table 8.6.2.2.1(a)' };
+    }
+    if (construction === 'cb_unob_lt3ft') return { maxArea: 130, maxSpacing: 15, minSpacing: 6, code: 'Table 8.6.2.2.1(a)' };
+    if (construction === 'cb_ob_3ft')     return { maxArea: 168, maxSpacing: 15, minSpacing: 6, code: 'Table 8.6.2.2.1(a)' };
+    if (construction === 'cb_ob_lt3ft')   return { maxArea: 130, maxSpacing: 15, minSpacing: 6, code: 'Table 8.6.2.2.1(a)' };
+    if (construction === 'concealed')     return { maxArea: 120, maxSpacing: '15 (slope) / 10 (⊥ slope)', minSpacing: 6, code: 'Table 8.6.2.2.1(a) · See § 8.6.4.1.4' };
+  }
+  if (hazard === 'ordinary') return { maxArea: 130, maxSpacing: 15, minSpacing: 6, code: 'Table 8.6.2.2.1(b)' };
+  if (hazard === 'extra') {
+    if (sysType === 'pipe_sched') return { maxArea: 90,  maxSpacing: 12, minSpacing: 6, code: 'Table 8.6.2.2.1(c)' };
+    if (sysType === 'hc_hi')      return { maxArea: 100, maxSpacing: 12, minSpacing: 6, code: 'Table 8.6.2.2.1(c)' };
+    if (sysType === 'hc_lo')      return { maxArea: 130, maxSpacing: 15, minSpacing: 6, code: 'Table 8.6.2.2.1(c)' };
+  }
+  if (hazard === 'highpiled') {
+    if (sysType === 'hc_hi') return { maxArea: 100, maxSpacing: 12, minSpacing: 6, code: 'Table 8.6.2.2.1(d)' };
+    if (sysType === 'hc_lo') return { maxArea: 130, maxSpacing: 15, minSpacing: 6, code: 'Table 8.6.2.2.1(d)' };
+    return { maxArea: null, maxSpacing: null, minSpacing: 6, code: 'Table 8.6.2.2.1(d)', note: 'Pipe schedule not listed for high-piled storage. Hydraulic calculation required.' };
+  }
+  return null;
+}
+
+// Table 8.7.2.2.1 — Standard Sidewall Spacing
+function lookupSidewallSpacing(hazard, ceil) {
+  if (hazard === 'light') {
+    if (ceil === 'combustible')    return { maxS: 14, maxL: 12, maxArea: 120, code: 'Table 8.7.2.2.1' };
+    if (ceil === 'noncombustible') return { maxS: 14, maxL: 14, maxArea: 196, code: 'Table 8.7.2.2.1' };
+  }
+  if (hazard === 'ordinary') {
+    if (ceil === 'combustible')    return { maxS: 10, maxL: 10, maxArea: 80,  code: 'Table 8.7.2.2.1' };
+    if (ceil === 'noncombustible') return { maxS: 10, maxL: 10, maxArea: 100, code: 'Table 8.7.2.2.1' };
+  }
+  return null;
+}
+
+// ═══════════════════════════════════════════════════
+// FORMAT HELPERS
+// ═══════════════════════════════════════════════════
+function fmtInches(totalIn) {
+  if (totalIn === 0) return '0 in';
+  const ft = Math.floor(totalIn / 12);
+  const inches = totalIn % 12;
+  if (ft === 0) return `${inches} in`;
+  if (inches === 0) return `${ft} ft`;
+  const inStr = Number.isInteger(inches) ? inches : inches.toFixed(1);
+  return `${ft} ft ${inStr} in`;
+}
+
+// ═══════════════════════════════════════════════════
+// OBSTRUCTION UI CONTROLS
+// ═══════════════════════════════════════════════════
+function setCoverage(val) {
+  state.obs.coverage = val;
+  document.getElementById('btn-cov-std').classList.toggle('active', val === 'standard');
+  document.getElementById('btn-cov-ext').classList.toggle('active', val === 'extended');
+  updateObsPrompt();
+  clearObsResult();
+}
+
+function setOrientation(val) {
+  state.obs.orient = val;
+  document.getElementById('btn-orient-up').classList.toggle('active', val === 'upright');
+  document.getElementById('btn-orient-pd').classList.toggle('active', val === 'pendant');
+  document.getElementById('btn-orient-sw').classList.toggle('active', val === 'sidewall');
+  updateObsPrompt();
+  clearObsResult();
+}
+
+function setObstruction(val) {
+  state.obs.obsType = val;
+  document.getElementById('btn-obs-header').classList.toggle('active', val === 'header');
+  document.getElementById('btn-obs-soffit').classList.toggle('active', val === 'soffit');
+  updateObsPrompt();
+  clearObsResult();
+}
+
+function updateObsPrompt() {
+  const o = state.obs;
+
+  const covEl    = document.getElementById('prompt-coverage');
+  const orientEl = document.getElementById('prompt-orient');
+  const bEl      = document.getElementById('prompt-b');
+  const obsEl    = document.getElementById('prompt-obs');
+
+  if (o.coverage) { covEl.textContent = o.coverage; covEl.classList.remove('empty'); }
+  else            { covEl.textContent = 'coverage';  covEl.classList.add('empty'); }
+
+  if (o.orient) { orientEl.textContent = o.orient; orientEl.classList.remove('empty'); }
+  else          { orientEl.textContent = 'orientation'; orientEl.classList.add('empty'); }
+
+  if (o.bIn > 0) { bEl.textContent = o.bIn + ' in'; bEl.classList.remove('empty'); }
+  else           { bEl.textContent = '?'; bEl.classList.add('empty'); }
+
+  if (o.obsType) { obsEl.textContent = o.obsType; obsEl.classList.remove('empty'); }
+  else           { obsEl.textContent = 'obstruction'; obsEl.classList.add('empty'); }
+}
+
+function clearObsResult() {
+  document.getElementById('obs-result').innerHTML = '';
+}
+
+// ═══════════════════════════════════════════════════
+// OBSTRUCTION CALCULATE
+// ═══════════════════════════════════════════════════
+function calculateObstruction() {
+  const o = state.obs;
+  const resultEl = document.getElementById('obs-result');
+
+  if (!o.coverage) { flashMissing('btn-cov-std','btn-cov-ext'); return; }
+  if (!o.orient)   { flashMissing('btn-orient-up','btn-orient-pd','btn-orient-sw'); return; }
+  if (!o.obsType)  { flashMissing('btn-obs-header','btn-obs-soffit'); return; }
+
+  const bInches = o.bIn;
+  const tableOrient = o.orient === 'sidewall' ? 'sidewall' : 'upright';
+  const result = lookupMinA(tableOrient, bInches);
+
+  const coverageLabel = o.coverage.charAt(0).toUpperCase() + o.coverage.slice(1);
+  const orientLabel = o.orient === 'sidewall'
+    ? `${coverageLabel} Sidewall (SSW)`
+    : o.orient === 'pendant'
+      ? `${coverageLabel} Pendent (SSP)`
+      : `${coverageLabel} Upright (SSU)`;
+  const codeRef = o.orient === 'sidewall' ? 'NFPA 13–2016 Table 8.7.5.1.3' : 'NFPA 13–2016 Table 8.6.5.1.2';
+
+  if (result === null) {
+    resultEl.innerHTML = `
+      <div class="result-card fail" style="margin-top:16px">
+        <div class="result-head">
+          <div class="result-icon">⛔</div>
+          <div class="result-status">CANNOT COMPLY</div>
+        </div>
+        <div class="result-body">
+          <div class="result-main">REPOSITION HEAD</div>
+          <div class="result-sub">
+            A deflector height of <strong>${fmtInches(bInches)}</strong> above the ${o.obsType} bottom
+            exceeds the maximum value in the table (35 in for upright/pendent, 14 in for sidewall).
+            The sprinkler must be relocated to a compliant position.
+          </div>
+          <div class="result-code">${codeRef} · ${orientLabel}</div>
+        </div>
+      </div>`;
+    return;
+  }
+
+  if (result.special === 'zero') {
+    resultEl.innerHTML = `
+      <div class="result-card pass" style="margin-top:16px">
+        <div class="result-head">
+          <div class="result-icon">✅</div>
+          <div class="result-status">NO CLEARANCE REQUIRED</div>
+        </div>
+        <div class="result-body">
+          <div class="result-main">ANY DISTANCE</div>
+          <div class="result-sub">
+            When the deflector is at the same level as the bottom of the ${o.obsType} (B = 0),
+            the obstruction does not restrict horizontal placement per Table 8.6.5.1.2.
+          </div>
+          <div class="result-code">${codeRef} · ${orientLabel}</div>
+        </div>
+      </div>`;
+    return;
+  }
+
+  const minAFmt = fmtInches(result.minA);
+  resultEl.innerHTML = `
+    <div class="result-card info" style="margin-top:16px">
+      <div class="result-head">
+        <div class="result-icon">📏</div>
+        <div class="result-status">MINIMUM DISTANCE</div>
+      </div>
+      <div class="result-body">
+        <div class="result-main">${minAFmt}</div>
+        <div class="result-sub">
+          The sprinkler must be positioned at least <strong>${minAFmt}</strong> from the side of the
+          ${o.obsType} when the deflector is <strong>${fmtInches(bInches)}</strong>
+          above the bottom of the obstruction.
+        </div>
+        <div class="result-code">${codeRef} · ${orientLabel}</div>
+      </div>
+    </div>`;
+}
+
+function flashMissing(...ids) {
+  ids.forEach(id => {
+    const el = document.getElementById(id);
+    el.style.outline = '2px solid var(--red)';
+    setTimeout(() => el.style.outline = '', 1200);
+  });
+}
+
+// ═══════════════════════════════════════════════════
+// SPACING UI CONTROLS
+// ═══════════════════════════════════════════════════
+const spState = { orient: null, hazard: null, ceil: null, sysType: null };
+
+function setSpacingOrient(val) {
+  spState.orient = val;
+  document.getElementById('sp-btn-up').classList.toggle('active', val === 'upright');
+  document.getElementById('sp-btn-sw').classList.toggle('active', val === 'sidewall');
+  updateSpacingUI();
+  clearSpResult();
+}
+
+function setSpacingCeil(val) {
+  spState.ceil = val;
+  document.getElementById('sp-ceil-comb').classList.toggle('active', val === 'combustible');
+  document.getElementById('sp-ceil-nc').classList.toggle('active', val === 'noncombustible');
+  clearSpResult();
+}
+
+function setSpacingSys(val) {
+  spState.sysType = val;
+  document.getElementById('sp-sys-hc-lo').classList.toggle('active', val === 'hc_lo');
+  document.getElementById('sp-sys-hc-hi').classList.toggle('active', val === 'hc_hi');
+  document.getElementById('sp-sys-ps').classList.toggle('active', val === 'pipe_sched');
+  clearSpResult();
+}
+
+function onSpacingHazardChange() {
+  spState.hazard = document.getElementById('sp-hazard').value || null;
+  updateSpacingUI();
+  clearSpResult();
+}
+
+function updateSpacingUI() {
+  const isUpright  = spState.orient === 'upright';
+  const isSidewall = spState.orient === 'sidewall';
+  const hazard     = spState.hazard;
+
+  document.getElementById('sp-construction-section').style.display = (isUpright && hazard === 'light') ? '' : 'none';
+  document.getElementById('sp-ceiling-section').style.display      = (isSidewall && hazard) ? '' : 'none';
+  document.getElementById('sp-systype-section').style.display      = (isUpright && (hazard === 'extra' || hazard === 'highpiled')) ? '' : 'none';
+  document.getElementById('sp-sys-ps').style.display               = hazard === 'highpiled' ? 'none' : '';
+  document.getElementById('sw-extra-warn').classList.toggle('visible', isSidewall && (hazard === 'extra' || hazard === 'highpiled'));
+}
+
+function clearSpResult() {
+  document.getElementById('sp-result').innerHTML = '';
+}
+
+// ═══════════════════════════════════════════════════
+// SPACING CALCULATE
+// ═══════════════════════════════════════════════════
+function calculateSpacing() {
+  const o = spState.orient;
+  const h = spState.hazard;
+  const resultEl = document.getElementById('sp-result');
+
+  if (!o) { flashMissing('sp-btn-up','sp-btn-sw'); return; }
+  if (!h) return;
+
+  if (o === 'sidewall' && (h === 'extra' || h === 'highpiled')) {
+    resultEl.innerHTML = `
+      <div class="result-card fail" style="margin-top:16px">
+        <div class="result-head"><div class="result-icon">⛔</div><div class="result-status">NOT PERMITTED</div></div>
+        <div class="result-body">
+          <div class="result-sub">Standard sidewall sprinklers are not listed for extra hazard or high-piled storage. Use upright or pendent heads.</div>
+          <div class="result-code">NFPA 13–2016 § 8.4.2</div>
+        </div>
+      </div>`;
+    return;
+  }
+
+  if (o === 'sidewall') {
+    if (!spState.ceil) { flashMissing('sp-ceil-comb','sp-ceil-nc'); return; }
+    const data = lookupSidewallSpacing(h, spState.ceil);
+    if (!data) return;
+    resultEl.innerHTML = `
+      <div class="result-card info" style="margin-top:16px">
+        <div class="result-head"><div class="result-icon">📐</div><div class="result-status">SIDEWALL SPACING</div></div>
+        <div class="result-body">
+          <table class="result-table">
+            <tr><td>Max Area / Head</td><td>${data.maxArea} ft²</td></tr>
+            <tr><td>Max Along-Wall (S)</td><td>${data.maxS} ft</td></tr>
+            <tr><td>Max Room Width (L)</td><td>${data.maxL} ft</td></tr>
+            <tr><td>Min From End Wall</td><td>4 in</td></tr>
+            <tr><td>Min Between Heads</td><td>6 ft</td></tr>
+          </table>
+          <div class="result-sub" style="margin-top:8px">Distance to end walls shall not exceed ½ × max S.</div>
+          <div class="result-code">${data.code} · Standard Sidewall (SSW)</div>
+        </div>
+      </div>`;
+    return;
+  }
+
+  const constr = document.getElementById('sp-construction').value;
+  const sys    = spState.sysType;
+
+  if (h === 'light' && !constr) return;
+  if ((h === 'extra' || h === 'highpiled') && !sys) { flashMissing('sp-sys-hc-lo','sp-sys-hc-hi','sp-sys-ps'); return; }
+
+  const data = lookupUprightSpacing(h, constr, sys);
+  if (!data) return;
+
+  const noteLine = data.note ? `<div class="result-sub" style="margin-top:8px;color:#fca5a5">⚠ ${data.note}</div>` : '';
+  resultEl.innerHTML = `
+    <div class="result-card info" style="margin-top:16px">
+      <div class="result-head"><div class="result-icon">📐</div><div class="result-status">UPRIGHT / PENDENT SPACING</div></div>
+      <div class="result-body">
+        <table class="result-table">
+          <tr><td>Max Area / Head</td><td>${data.maxArea ? data.maxArea + ' ft²' : 'N/A'}</td></tr>
+          <tr><td>Max Spacing Between</td><td>${data.maxSpacing ? data.maxSpacing + ' ft' : 'N/A'}</td></tr>
+          <tr><td>Min Between Heads</td><td>6 ft</td></tr>
+          <tr><td>Max From Wall</td><td>½ × Max Spacing</td></tr>
+          <tr><td>Min From Wall</td><td>4 in</td></tr>
+        </table>
+        ${noteLine}
+        <div class="result-code">${data.code} · Standard Pendent &amp; Upright (SSU/SSP)</div>
+      </div>
+    </div>`;
+}
+</script>
+</body>
+</html>
