@@ -615,6 +615,11 @@ body{
 <!-- ═══════════════════════════════ HOME ═══════════════════════════════ -->
 <div class="screen active" id="screen-home">
   <div class="home-header">
+    <div style="display:flex;justify-content:center;margin-bottom:10px;">
+      <svg viewBox="245 120 128 180" width="56" height="79" xmlns="http://www.w3.org/2000/svg">
+        <path d="M0 0 C30.97397191 10.3246573 38.71610636 46.39208438 39.6953125 74.7890625 C41.15812918 99.80697847 41.15812918 99.80697847 52 98 C59.38986993 87.2364938 58.23133365 75.84773423 54 64 C53.835 63.34 53.835 63.34 53 60 C73.30798474 80.30798474 84.39002374 109.6067509 77 138 C76.608125 139.629375 76.21625 141.25875 75.8125 142.9375 C69.98314236 159.21949891 50.89019691 182.97254923 31 178 C33.66097465 175.66017747 36.32861069 173.32792497 39 171 C46.21664927 149.35005219 34.22671375 139.23697561 16.078125 130.953125 C1.69160797 124.06303063 -4.09579191 112.74966624 -4.25 97.1875 C-4.27578125 95.63417969 -4.3015625 94.08085937 -4.328125 92.48046875 C-4 88 -4 88 -1 81 C-21.07100663 105.90291563 -26.83418651 136.16551237 -7 163 C-7 163.66 -7 164.32 -7 165 C-6.01 165.33 -5.02 165.66 -4 166 C-2.35 167.98 -0.7 169.96 1 172 C2.65 173.32 4.3 174.64 6 176 C6 180.80106711 -3.58810355 176.56494872 -6 176 C-29.64415606 165.48364402 -43.33018107 146.05648459 -43.25 119.9375 C-43.25515625 118.25527344 -43.2603125 116.57304687 -43.265625 114.83984375 C-41.99457846 91.68062805 -24.57046875 76.33137119 -8.9609375 61.18359375 C1.83629331 49.90176282 7.09233307 39.85164999 7.3125 24.3125 C7.34988281 22.59675781 7.38726562 20.88101563 7.42578125 19.11328125 C6.79964956 11.5939566 3.83538977 6.39231628 0 0 Z" fill="#f55f00" transform="translate(288,120)"/>
+      </svg>
+    </div>
     <div class="logo"><span>NFPA</span> 13</div>
     <div class="edition">2016 Edition · Chapter 8</div>
     <div class="tagline">Field reference tool for sprinkler<br>fitters and layout technicians</div>
@@ -697,11 +702,118 @@ body{
       </div>
       <div class="arrow">›</div>
     </button>
+    <button class="home-btn" onclick="goTo('screen-drylog')">
+      <div class="icon">
+        <svg viewBox="0 0 56 56" width="36" height="36" xmlns="http://www.w3.org/2000/svg">
+          <!-- Clipboard body -->
+          <rect x="10" y="10" width="36" height="42" rx="2" fill="none" stroke="#f55f00" stroke-width="2"/>
+          <!-- Clipboard top tab -->
+          <rect x="20" y="7" width="16" height="7" rx="2" fill="#f55f00"/>
+          <!-- List lines -->
+          <line x1="16" y1="24" x2="40" y2="24" stroke="#ffffff" stroke-width="2"/>
+          <line x1="16" y1="32" x2="40" y2="32" stroke="#ffffff" stroke-width="2"/>
+          <line x1="16" y1="40" x2="32" y2="40" stroke="#ffffff" stroke-width="2"/>
+          <!-- Plus sign (add) -->
+          <circle cx="40" cy="42" r="7" fill="#f55f00"/>
+          <line x1="40" y1="38" x2="40" y2="46" stroke="#fff" stroke-width="2"/>
+          <line x1="36" y1="42" x2="44" y2="42" stroke="#fff" stroke-width="2"/>
+        </svg>
+      </div>
+      <div class="btn-text">
+        <div class="label">Dry Head Log</div>
+        <div class="desc">Record dry sprinkler barrel lengths and email the report</div>
+      </div>
+      <div class="arrow">›</div>
+    </button>
   </div>
   <div class="home-footer">Standard &amp; Extended Coverage · NFPA 13–2016</div>
 </div>
 
-<!-- ═══════════════════════════════ OBSTRUCTIONS ═══════════════════════ -->
+<!-- ═══════════════════════════════ DRY HEAD LOG ═══════════════════════ -->
+<div class="screen" id="screen-drylog">
+  <div class="topbar">
+    <div class="back" onclick="goTo('screen-home')">‹</div>
+    <div>
+      <div class="title">Dry Head Log</div>
+      <div class="subtitle">Barrel Length Recorder</div>
+    </div>
+  </div>
+
+  <!-- Add Entry -->
+  <div class="section">
+    <div class="section-head">
+      <div class="step-badge">+</div>
+      <div class="sec-label">Add Sprinkler</div>
+    </div>
+    <div class="section-body">
+      <div style="margin-bottom:10px;">
+        <div class="dist-label">Location / Tag (optional)</div>
+        <input id="drylog-tag" type="text" placeholder="e.g. Room 101, Head A"
+          style="width:100%;background:var(--card2);border:1px solid var(--border);border-radius:8px;
+          color:var(--text);font-family:'Barlow',sans-serif;font-size:15px;padding:12px 14px;
+          -webkit-appearance:none;outline:none;box-sizing:border-box;"/>
+      </div>
+      <div class="dist-label" style="margin-bottom:6px;">Barrel Length</div>
+      <div style="display:flex;gap:10px;align-items:flex-end;">
+        <div style="flex:1">
+          <div class="dist-label">Inches</div>
+          <div class="dist-field" onclick="openDryKeypad('in')">
+            <div class="df-val" id="val-dry-in">0</div>
+            <div class="df-unit">in ▸</div>
+          </div>
+        </div>
+        <div style="flex:0 0 auto">
+          <button onclick="addDryEntry()"
+            style="-webkit-appearance:none;background:var(--orange);border:none;border-radius:8px;
+            color:#fff;font-family:'Bebas Neue',cursive;font-size:18px;letter-spacing:1px;
+            padding:14px 20px;cursor:pointer;white-space:nowrap;">
+            ADD
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Entry List -->
+  <div class="section" id="drylog-list-section" style="display:none">
+    <div class="section-head">
+      <div class="step-badge" style="background:var(--card2);color:var(--text2);border:1px solid var(--border)" id="drylog-count-badge">0</div>
+      <div class="sec-label">Recorded Lengths</div>
+      <button onclick="clearAllDry()"
+        style="-webkit-appearance:none;margin-left:auto;background:none;border:1px solid var(--border);
+        border-radius:6px;color:var(--text3);font-size:11px;font-weight:700;letter-spacing:0.5px;
+        text-transform:uppercase;padding:4px 10px;cursor:pointer;">
+        CLEAR ALL
+      </button>
+    </div>
+    <div class="section-body" style="padding:0">
+      <div id="drylog-entries"></div>
+    </div>
+  </div>
+
+  <!-- Email -->
+  <div class="section hidden" id="drylog-email-section">
+    <div class="section-head">
+      <div class="step-badge">✉</div>
+      <div class="sec-label">Send Report</div>
+    </div>
+    <div class="section-body">
+      <div class="dist-label" style="margin-bottom:6px;">Recipient Email</div>
+      <input id="drylog-email" type="email" placeholder="name@example.com"
+        style="width:100%;background:var(--card2);border:1px solid var(--border);border-radius:8px;
+        color:var(--text);font-family:'Barlow',sans-serif;font-size:15px;padding:12px 14px;
+        -webkit-appearance:none;outline:none;box-sizing:border-box;margin-bottom:12px;"/>
+      <button onclick="sendDryReport()"
+        style="-webkit-appearance:none;width:100%;background:var(--orange);border:none;border-radius:var(--radius);
+        padding:16px;font-family:'Bebas Neue',cursive;font-size:20px;letter-spacing:2px;color:#fff;
+        cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;">
+        ⚡ SEND REPORT
+      </button>
+    </div>
+  </div>
+
+  <div style="height:30px"></div>
+</div>
 <div class="screen" id="screen-obstruction">
   <div class="topbar">
     <div class="back" onclick="goTo('screen-home')">‹</div>
@@ -1107,7 +1219,8 @@ body{
       <button class="kp-key" onclick="kpKey('9')">9</button>
       <button class="kp-key kp-back" onclick="kpKey('back')">⌫</button>
       <button class="kp-key" onclick="kpKey('0')">0</button>
-      <button class="kp-key kp-ok" onclick="kpKey('ok')">OK</button>
+      <button class="kp-key" onclick="kpKey('half')" style="font-size:20px;">½</button>
+      <button class="kp-key kp-ok" style="grid-column:span 3" onclick="kpKey('ok')">OK</button>
     </div>
   </div>
 </div>
@@ -1139,6 +1252,7 @@ function goTo(id) {
   if (id === 'screen-obstruction') resetObs();
   if (id === 'screen-spacing')     resetSpacing();
   if (id === 'screen-layout')      resetLayout();
+  if (id === 'screen-drylog')      resetDryLog();
 }
 
 function resetObs() {
@@ -1243,39 +1357,53 @@ function kpOverlayTap(e) {
   if (e.target === document.getElementById('kp-overlay')) closeKeypad();
 }
 
+function fmtKpDisplay(buf) {
+  if (!buf || buf === '0') return '0';
+  return buf.endsWith('.5') ? buf.slice(0,-2) + '½' : buf;
+}
+function parseKpVal(buf) { return Math.max(0, parseFloat(buf) || 0); }
+function dispVal(v) { return v % 1 === 0 ? String(v) : v.toFixed(1); }
+
 function kpKey(key) {
   if (key === 'back') {
     kpBuffer = kpBuffer.slice(0, -1);
+  } else if (key === 'half') {
+    if (kpBuffer.length === 0) kpBuffer = '0.5';
+    else if (!kpBuffer.includes('.')) kpBuffer += '.5';
   } else if (key === 'ok') {
+    const val = parseKpVal(kpBuffer);
+    if (kpTarget === '__dry__') {
+      dryLog.in = val;
+      document.getElementById('val-dry-in').textContent = dispVal(val);
+      closeKeypad();
+      return;
+    }
     if (kpTarget === '__spwall__') {
-      let val = Math.max(0, parseInt(kpBuffer) || 0);
-      if (spWallKpTarget === 'in') val = Math.min(11, val);
-      if (spWallKpTarget === 'ft') { spWall.ft = val; document.getElementById('val-sp-wall-ft').textContent = val; }
-      else                         { spWall.in = val; document.getElementById('val-sp-wall-in').textContent = val; }
+      const v = spWallKpTarget === 'in' ? Math.min(11.5, val) : val;
+      if (spWallKpTarget === 'ft') { spWall.ft = v; document.getElementById('val-sp-wall-ft').textContent = dispVal(v); }
+      else                         { spWall.in = v; document.getElementById('val-sp-wall-in').textContent = dispVal(v); }
       closeKeypad();
       return;
     }
     if (kpTarget === '__room__') {
-      let val = Math.max(0, parseInt(kpBuffer) || 0);
-      if (rlKpTarget && rlKpTarget.endsWith('-in')) val = Math.min(11, val);
+      const v = (rlKpTarget && rlKpTarget.endsWith('-in')) ? Math.min(11.5, val) : val;
       const map = {
-        'len-ft': () => { rlState.lenFt = val; document.getElementById('val-len-ft').textContent = val; },
-        'len-in': () => { rlState.lenIn = val; document.getElementById('val-len-in').textContent = val; },
-        'wid-ft': () => { rlState.widFt = val; document.getElementById('val-wid-ft').textContent = val; },
-        'wid-in': () => { rlState.widIn = val; document.getElementById('val-wid-in').textContent = val; }
+        'len-ft': () => { rlState.lenFt = v; document.getElementById('val-len-ft').textContent = dispVal(v); },
+        'len-in': () => { rlState.lenIn = v; document.getElementById('val-len-in').textContent = dispVal(v); },
+        'wid-ft': () => { rlState.widFt = v; document.getElementById('val-wid-ft').textContent = dispVal(v); },
+        'wid-in': () => { rlState.widIn = v; document.getElementById('val-wid-in').textContent = dispVal(v); }
       };
       if (map[rlKpTarget]) map[rlKpTarget]();
       closeKeypad();
       document.getElementById('rl-result').innerHTML = '';
       updateRlCalcBtn();
     } else {
-      const val = Math.max(0, parseInt(kpBuffer) || 0);
       if (kpTarget === 'dim') {
         state.obs.obsDim = val;
-        document.getElementById('val-obs-dim').textContent = val;
+        document.getElementById('val-obs-dim').textContent = dispVal(val);
       } else {
         state.obs.bIn = val;
-        document.getElementById('val-b-in').textContent = val;
+        document.getElementById('val-b-in').textContent = dispVal(val);
       }
       updateObsPrompt();
       clearObsResult();
@@ -1284,9 +1412,9 @@ function kpKey(key) {
     }
     return;
   } else {
-    if (kpBuffer.length < 3) kpBuffer += key;
+    if (!kpBuffer.includes('.') && kpBuffer.length < 3) kpBuffer += key;
   }
-  document.getElementById('kp-display').textContent = kpBuffer || '0';
+  document.getElementById('kp-display').textContent = fmtKpDisplay(kpBuffer);
 }
 
 // ═══════════════════════════════════════════════════
@@ -2225,6 +2353,349 @@ function calculateLayout() {
       </div>
     </div>`;
 }
+
+// ═══════════════════════════════════════════════════
+// DRY HEAD LOG — localStorage-backed job manager
+// ═══════════════════════════════════════════════════
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbyNnTsGem1CU5cvQdTr_cWZPACeyVdgCB5YvZA_YTu7UXeZ8QMUxTrr1wdIEEDukv52fQ/exec';
+
+let dlActiveJobId = null;
+const dryLog = { in: 0 };
+
+function dlLoadJobs() {
+  try { return JSON.parse(localStorage.getItem('dl_jobs') || '{}'); }
+  catch(e) { return {}; }
+}
+function dlSaveJobs(jobs) {
+  try { localStorage.setItem('dl_jobs', JSON.stringify(jobs)); } catch(e) {}
+}
+
+function createNewJob() {
+  const name = document.getElementById('dl-new-job-name').value.trim();
+  if (!name) {
+    document.getElementById('dl-new-job-name').style.outline = '2px solid var(--red)';
+    setTimeout(() => document.getElementById('dl-new-job-name').style.outline = '', 1200);
+    return;
+  }
+  const jobs = dlLoadJobs();
+  const id   = 'job_' + Date.now();
+  jobs[id]   = { name, created: new Date().toLocaleDateString('en-US'), entries: [] };
+  dlSaveJobs(jobs);
+  document.getElementById('dl-new-job-name').value = '';
+  dlActiveJobId = id;
+  dlRefreshUI();
+}
+
+function selectJob(id) {
+  dlActiveJobId = id;
+  dlRefreshUI();
+}
+
+function markOrdered() {
+  if (!dlActiveJobId) return;
+  if (!confirm('Remove "' + dlGetActiveJob().name + '" from the log? This cannot be undone.')) return;
+  const jobs = dlLoadJobs();
+  delete jobs[dlActiveJobId];
+  dlSaveJobs(jobs);
+  dlActiveJobId = null;
+  dlRefreshUI();
+}
+
+function dlGetActiveJob() {
+  if (!dlActiveJobId) return null;
+  const jobs = dlLoadJobs();
+  return jobs[dlActiveJobId] || null;
+}
+
+function dlRefreshUI() {
+  const jobs   = dlLoadJobs();
+  const ids    = Object.keys(jobs);
+  const picker = document.getElementById('dl-job-picker-wrap');
+  const sel    = document.getElementById('dl-job-select');
+
+  if (ids.length > 0) {
+    picker.style.display = '';
+    sel.innerHTML = ids.map(id =>
+      `<option value="${id}" ${id === dlActiveJobId ? 'selected' : ''}>${escHtml(jobs[id].name)}</option>`
+    ).join('');
+    // Sync active job to whatever is selected if we just deleted one
+    if (!dlActiveJobId || !jobs[dlActiveJobId]) {
+      dlActiveJobId = ids[0];
+      sel.value = dlActiveJobId;
+    }
+  } else {
+    picker.style.display = 'none';
+    dlActiveJobId = null;
+  }
+
+  const job = dlGetActiveJob();
+  const addSection   = document.getElementById('dl-add-section');
+  const listSection  = document.getElementById('drylog-list-section');
+  const emailSection = document.getElementById('drylog-email-section');
+
+  if (job) {
+    addSection.classList.remove('hidden');
+    document.getElementById('dl-add-label').textContent = 'Add Sprinkler — ' + job.name;
+
+    if (job.entries.length > 0) {
+      listSection.classList.remove('hidden');
+      emailSection.classList.remove('hidden');
+    } else {
+      listSection.classList.add('hidden');
+      emailSection.classList.add('hidden');
+    }
+    document.getElementById('drylog-count-badge').textContent = job.entries.length;
+    renderDryEntries(job);
+  } else {
+    addSection.classList.add('hidden');
+    listSection.classList.add('hidden');
+    emailSection.classList.add('hidden');
+  }
+}
+
+function openDryKeypad() {
+  dryLog.in = 0;
+  kpBuffer  = '';
+  kpTarget  = '__dry__';
+  document.getElementById('kp-field-label').textContent = 'BARREL LENGTH — INCHES';
+  document.getElementById('kp-hint').textContent        = 'Enter total inches, then OK';
+  document.getElementById('kp-display').textContent     = '0';
+  document.querySelectorAll('.dist-field').forEach(f => f.classList.remove('active-field'));
+  document.getElementById('kp-overlay').classList.add('open');
+}
+
+function addDryEntry() {
+  if (dryLog.in === 0) { flashMissing('val-dry-in'); return; }
+  const job = dlGetActiveJob();
+  if (!job) return;
+  const tag = document.getElementById('drylog-tag').value.trim();
+  job.entries.push({ tag, in: dryLog.in });
+  const jobs = dlLoadJobs();
+  jobs[dlActiveJobId] = job;
+  dlSaveJobs(jobs);
+  dryLog.in = 0;
+  document.getElementById('val-dry-in').textContent = '0';
+  document.getElementById('drylog-tag').value = '';
+  dlRefreshUI();
+}
+
+function deleteDryEntry(idx) {
+  const job = dlGetActiveJob();
+  if (!job) return;
+  job.entries.splice(idx, 1);
+  const jobs = dlLoadJobs();
+  jobs[dlActiveJobId] = job;
+  dlSaveJobs(jobs);
+  dlRefreshUI();
+}
+
+function renderDryEntries(job) {
+  const container = document.getElementById('drylog-entries');
+  if (!job || job.entries.length === 0) { container.innerHTML = ''; return; }
+  container.innerHTML = job.entries.map((e, i) => {
+    const label  = e.tag || ('Head #' + (i + 1));
+    const lenStr = fmtDryLen(e);
+    return `<div style="display:flex;align-items:center;padding:12px 16px;border-bottom:1px solid var(--border);gap:12px;">
+      <div style="flex:1;min-width:0;">
+        <div style="font-size:12px;color:var(--text2);font-weight:600;text-transform:uppercase;letter-spacing:0.5px;">${escHtml(label)}</div>
+        <div style="font-family:'Bebas Neue',cursive;font-size:22px;letter-spacing:1px;color:var(--text);line-height:1.1;">${lenStr}</div>
+      </div>
+      <button onclick="deleteDryEntry(${i})"
+        style="-webkit-appearance:none;background:none;border:1px solid var(--border);border-radius:6px;
+        color:var(--text3);font-size:16px;width:36px;height:36px;cursor:pointer;flex-shrink:0;">&#10005;</button>
+    </div>`;
+  }).join('');
+}
+
+function fmtDryLen(e) { return e.in + ' in'; }
+function escHtml(str) {
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+async function sendDryReport() {
+  const email = document.getElementById('drylog-email').value.trim();
+  if (!email) {
+    document.getElementById('drylog-email').style.outline = '2px solid var(--red)';
+    setTimeout(() => document.getElementById('drylog-email').style.outline = '', 1200);
+    return;
+  }
+  const job = dlGetActiveJob();
+  if (!job) return;
+  const statusEl = document.getElementById('dl-send-status');
+
+  const date    = new Date().toLocaleDateString('en-US', { year:'numeric', month:'long', day:'numeric' });
+  const subject = 'Dry Sprinkler Barrel Length Report — ' + job.name + ' — ' + date;
+  let body = 'Dry Sprinkler Barrel Length Report\r\n';
+  body += 'Job: ' + job.name + '\r\n';
+  body += 'Date: ' + date + '\r\n';
+  body += '─────────────────────────────\r\n\r\n';
+  job.entries.forEach((e, i) => {
+    const label = e.tag || ('Head #' + (i + 1));
+    body += (i + 1) + '.  ' + label + '\r\n';
+    body += '    Length: ' + fmtDryLen(e) + '\r\n\r\n';
+  });
+  body += '─────────────────────────────\r\n';
+  body += 'Total heads: ' + job.entries.length + '\r\n';
+  body += '\r\nGenerated by NFPA 13 Field Tool';
+
+  if (GAS_URL) {
+    statusEl.textContent = 'Sending…';
+    try {
+      const res = await fetch(GAS_URL, {
+        method: 'POST',
+        body: JSON.stringify({ to: email, subject, body }),
+        headers: { 'Content-Type': 'application/json' }
+      });
+      const data = await res.json();
+      if (data.status === 'ok') {
+        statusEl.style.color = '#4ade80';
+        statusEl.textContent = '✓ Email sent successfully';
+      } else {
+        throw new Error(data.error || 'Unknown error');
+      }
+    } catch(err) {
+      statusEl.style.color = '#f87171';
+      statusEl.textContent = '✗ Send failed: ' + err.message;
+    }
+  } else {
+    // Fallback: mailto until GAS_URL is configured
+    const a = document.createElement('a');
+    a.href = 'mailto:' + email + '?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body.replace(/\\r\\n/g,'\n'));
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    statusEl.style.color = 'var(--text2)';
+    statusEl.textContent = 'Email app opened';
+  }
+}
+
+function resetDryLog() {
+  // Don't clear jobs on navigation — only reset the UI input state
+  dryLog.in = 0;
+  document.getElementById('val-dry-in').textContent = '0';
+  document.getElementById('drylog-tag').value = '';
+  document.getElementById('dl-send-status').textContent = '';
+  document.getElementById('dl-send-status').style.color = 'var(--text2)';
+  dlRefreshUI();
+}
 </script>
 </body>
-</html>
+</html><!-- ═══════════════════════════════ DRY HEAD LOG ═══════════════════════ -->
+<div class="screen" id="screen-drylog">
+  <div class="topbar">
+    <div class="back" onclick="goTo('screen-home')">‹</div>
+    <div>
+      <div class="title">Dry Head Log</div>
+      <div class="subtitle">Barrel Length Recorder</div>
+    </div>
+  </div>
+
+  <!-- Job Selector -->
+  <div class="section">
+    <div class="section-head">
+      <div class="step-badge">1</div>
+      <div class="sec-label">Select or Create Job</div>
+    </div>
+    <div class="section-body">
+      <div id="dl-job-picker-wrap" style="display:none;margin-bottom:10px;">
+        <div class="dist-label" style="margin-bottom:6px;">Active Job</div>
+        <div class="select-wrap">
+          <select id="dl-job-select" onchange="selectJob(this.value)"></select>
+        </div>
+      </div>
+      <div class="dist-label" style="margin-bottom:6px;">New Job Name</div>
+      <div style="display:flex;gap:8px;">
+        <input id="dl-new-job-name" type="text" placeholder="e.g. 123 Main St — 2nd Floor"
+          style="flex:1;background:var(--card2);border:1px solid var(--border);border-radius:8px;
+          color:var(--text);font-family:'Barlow',sans-serif;font-size:15px;padding:12px 14px;
+          -webkit-appearance:none;outline:none;box-sizing:border-box;"/>
+        <button onclick="createNewJob()"
+          style="-webkit-appearance:none;background:var(--orange);border:none;border-radius:8px;
+          color:#fff;font-family:'Bebas Neue',cursive;font-size:18px;letter-spacing:1px;
+          padding:12px 18px;cursor:pointer;white-space:nowrap;flex-shrink:0;">
+          CREATE
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Entry -->
+  <div class="section hidden" id="dl-add-section">
+    <div class="section-head">
+      <div class="step-badge">2</div>
+      <div class="sec-label" id="dl-add-label">Add Sprinkler</div>
+    </div>
+    <div class="section-body">
+      <div style="margin-bottom:10px;">
+        <div class="dist-label">Location / Tag (optional)</div>
+        <input id="drylog-tag" type="text" placeholder="e.g. Room 101, Head A"
+          style="width:100%;background:var(--card2);border:1px solid var(--border);border-radius:8px;
+          color:var(--text);font-family:'Barlow',sans-serif;font-size:15px;padding:12px 14px;
+          -webkit-appearance:none;outline:none;box-sizing:border-box;"/>
+      </div>
+      <div class="dist-label" style="margin-bottom:6px;">Barrel Length</div>
+      <div style="display:flex;gap:10px;align-items:flex-end;">
+        <div style="flex:1">
+          <div class="dist-label">Inches</div>
+          <div class="dist-field" onclick="openDryKeypad()">
+            <div class="df-val" id="val-dry-in">0</div>
+            <div class="df-unit">in &#9658;</div>
+          </div>
+        </div>
+        <div style="flex:0 0 auto">
+          <button onclick="addDryEntry()"
+            style="-webkit-appearance:none;background:var(--orange);border:none;border-radius:8px;
+            color:#fff;font-family:'Bebas Neue',cursive;font-size:18px;letter-spacing:1px;
+            padding:14px 20px;cursor:pointer;white-space:nowrap;">
+            ADD
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Entry List -->
+  <div class="section hidden" id="drylog-list-section">
+    <div class="section-head">
+      <div class="step-badge" style="background:var(--card2);color:var(--text2);border:1px solid var(--border)" id="drylog-count-badge">0</div>
+      <div class="sec-label">Recorded Lengths</div>
+    </div>
+    <div class="section-body" style="padding:0">
+      <div id="drylog-entries"></div>
+    </div>
+  </div>
+
+  <!-- Send & Complete -->
+  <div class="section hidden" id="drylog-email-section">
+    <div class="section-head">
+      <div class="step-badge">&#10003;</div>
+      <div class="sec-label">Send &amp; Complete Job</div>
+    </div>
+    <div class="section-body">
+      <div class="dist-label" style="margin-bottom:6px;">Recipient Email</div>
+      <input id="drylog-email" type="email" placeholder="name@example.com"
+        style="width:100%;background:var(--card2);border:1px solid var(--border);border-radius:8px;
+        color:var(--text);font-family:'Barlow',sans-serif;font-size:15px;padding:12px 14px;
+        -webkit-appearance:none;outline:none;box-sizing:border-box;margin-bottom:10px;"/>
+      <button onclick="sendDryReport()"
+        style="-webkit-appearance:none;width:100%;background:var(--orange);border:none;border-radius:var(--radius);
+        padding:16px;font-family:'Bebas Neue',cursive;font-size:20px;letter-spacing:2px;color:#fff;
+        cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:10px;">
+        &#9889; SEND REPORT
+      </button>
+      <div id="dl-send-status" style="font-size:13px;color:var(--text2);text-align:center;min-height:18px;margin-bottom:10px;"></div>
+      <div style="padding-top:12px;border-top:1px solid var(--border);">
+        <button onclick="markOrdered()"
+          style="-webkit-appearance:none;width:100%;background:#15803d;border:none;border-radius:var(--radius);
+          padding:14px;font-family:'Bebas Neue',cursive;font-size:18px;letter-spacing:2px;color:#fff;cursor:pointer;">
+          &#10003; MARK AS ORDERED &#8212; REMOVE JOB
+        </button>
+        <div style="font-size:11px;color:var(--text3);text-align:center;margin-top:6px;line-height:1.4;">
+          Permanently removes this job from the log.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div style="height:30px"></div>
+</div>
