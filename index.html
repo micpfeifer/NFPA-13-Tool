@@ -626,7 +626,7 @@ body{
       </svg>
     </div>
     <div class="logo"><span>NFPA</span> 13</div>
-    <div class="edition">2016 Edition · Chapter 8</div>
+    <div class="edition">2019 Edition · Chapter 8</div>
     <div class="tagline">Field reference tool for sprinkler<br>fitters and layout technicians</div>
   </div>
   <div class="home-cards">
@@ -731,7 +731,7 @@ body{
       <div class="arrow">›</div>
     </button>
   </div>
-  <div class="home-footer">Standard &amp; Extended Coverage · NFPA 13–2016</div>
+  <div class="home-footer">Standard &amp; Extended Coverage · NFPA 13–2019</div>
 </div>
 
 <!-- ═══════════════════════════════ DRY HEAD LOG ═══════════════════════ -->
@@ -806,8 +806,10 @@ body{
           style="width:100%;background:var(--card2);border:1px solid var(--border);border-radius:8px;
           color:var(--text);font-family:'Barlow',sans-serif;font-size:15px;padding:14px 40px 14px 14px;
           -webkit-appearance:none;appearance:none;">
-          <option value="mrapp@jayhawkfire.com">Mike &#8212; mrapp@jayhawkfire.com</option>
-          <option value="zac@jayhawkfire.com">Zac &#8212; zac@jayhawkfire.com</option>
+          <option value="mrapp@jayhawkfire.com">Mike Rapp</option>
+          <option value="zac@jayhawkfire.com">Zac Parrington</option>
+          <option value="dana@jayhawkfire.com">Dana Ellis</option>
+          <option value="jhass@jayhawkfire.com">Bob Hass</option>
         </select>
       </div>
       <button onclick="dlSendReport()"
@@ -828,7 +830,7 @@ body{
     <div class="back" onclick="goTo('screen-home')">‹</div>
     <div>
       <div class="title">Obstructions</div>
-      <div class="subtitle">NFPA-13 2016 Edition</div>
+      <div class="subtitle">NFPA-13 2019 Edition</div>
     </div>
   </div>
 
@@ -892,15 +894,15 @@ body{
       <div style="display:flex;flex-direction:column;gap:8px;">
         <button class="toggle-btn" id="btn-sw-along" onclick="setSWObsOrient('along_wall')" style="text-align:left;padding:14px 16px;">
           ALONG THE WALL
-          <small>§ 8.7.5.1.4 · Lintel or soffit on same wall</small>
+          <small>§ 10.3.6.1.4 · Lintel or soffit on same wall</small>
         </button>
         <button class="toggle-btn" id="btn-sw-vert" onclick="setSWObsOrient('vertical')" style="text-align:left;padding:14px 16px;">
           VERTICAL OBSTRUCTION
-          <small>§ 8.7.5.2.1.3(a) · Columns, vertical pipes</small>
+          <small>§ 10.3.6.2.1.3(a) · Columns, vertical pipes</small>
         </button>
         <button class="toggle-btn" id="btn-sw-horiz" onclick="setSWObsOrient('horizontal')" style="text-align:left;padding:14px 16px;">
           HORIZONTAL ORIENTATION
-          <small>§ 8.7.5.2.1.3(b) · Horizontal beams, ducts</small>
+          <small>§ 10.3.6.2.1.3(b) · Horizontal beams, ducts</small>
         </button>
       </div>
     </div>
@@ -924,7 +926,28 @@ body{
     </div>
   </div>
 
-  <!-- Step 4: Deflector Height — upright/pendant + along-wall sidewall -->
+  <!-- Step 4: Soffit depth question — soffit path only -->
+  <div class="section hidden" id="obs-sec-soffit-depth">
+    <div class="section-head">
+      <div class="step-badge">4</div>
+      <div class="sec-label">Soffit Depth</div>
+    </div>
+    <div class="section-body">
+      <div style="font-size:14px;color:var(--text2);margin-bottom:14px;line-height:1.5;">
+        Is the soffit <strong style="color:var(--text)">24 inches (600 mm) or less</strong> in depth from the wall?
+      </div>
+      <div class="toggle-group">
+        <button class="toggle-btn" id="btn-soffit-yes" onclick="setSoffitDepth(true)">
+          YES<br><small>≤ 24 in deep</small>
+        </button>
+        <button class="toggle-btn" id="btn-soffit-no" onclick="setSoffitDepth(false)">
+          NO<br><small>&gt; 24 in deep</small>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Step 4/5: Deflector Height — upright/pendant + along-wall sidewall -->
   <div class="section hidden" id="obs-sec-dist">
     <div class="section-head">
       <div class="step-badge" id="dist-badge">4</div>
@@ -971,7 +994,7 @@ body{
     <div class="back" onclick="goTo('screen-home')">‹</div>
     <div>
       <div class="title">Head Spacing</div>
-      <div class="subtitle">NFPA 13 § 8.6 / § 8.7</div>
+      <div class="subtitle">NFPA 13 2019 · Ch. 10</div>
     </div>
   </div>
 
@@ -1010,7 +1033,7 @@ body{
         </select>
       </div>
       <div class="warn-box" id="sw-extra-warn">
-        Sidewall sprinklers are only listed for light and ordinary hazard occupancies per NFPA 13 § 8.4.2.
+        Sidewall sprinklers are only listed for light and ordinary hazard occupancies per NFPA 13 § 10.1.2.
       </div>
     </div>
   </div>
@@ -1123,7 +1146,7 @@ body{
     <div class="back" onclick="goTo('screen-home')">‹</div>
     <div>
       <div class="title">Room Layout</div>
-      <div class="subtitle">NFPA-13 2016 Edition</div>
+      <div class="subtitle">NFPA-13 2019 Edition</div>
     </div>
   </div>
 
@@ -1265,12 +1288,13 @@ function goTo(id) {
 }
 
 function resetObs() {
-  state.obs = { coverage: null, orient: null, swObsOrient: null, bIn: 0, obsDim: 0, obsType: null };
+  state.obs = { coverage: null, orient: null, swObsOrient: null, bIn: 0, obsDim: 0, obsType: null, soffitDeep: null };
 
   ['btn-cov-std','btn-cov-ext','btn-cov-res',
    'btn-orient-up','btn-orient-pd','btn-orient-sw',
    'btn-sw-along','btn-sw-vert','btn-sw-horiz',
-   'btn-obs-header','btn-obs-soffit'].forEach(id =>
+   'btn-obs-header','btn-obs-soffit',
+   'btn-soffit-yes','btn-soffit-no'].forEach(id =>
     document.getElementById(id).classList.remove('active'));
 
   ['lbl-orient-up','lbl-orient-pd','lbl-orient-sw'].forEach((id, i) =>
@@ -1284,6 +1308,7 @@ function resetObs() {
   hide('obs-sec-2');
   hide('obs-sec-sw-orient');
   hide('obs-sec-obstype');
+  hide('obs-sec-soffit-depth');
   hide('obs-sec-dist');
   hide('obs-sec-dim');
   hide('calc-obs-btn');
@@ -1304,9 +1329,6 @@ function resetSpacing() {
   document.getElementById('sp-construction').value = '';
   document.getElementById('sp-result').innerHTML = '';
   document.getElementById('sw-extra-warn').classList.remove('visible');
-  spWall.ft = 0; spWall.in = 0;
-  document.getElementById('val-sp-wall-ft').textContent = '0';
-  document.getElementById('val-sp-wall-in').textContent = '0';
 
   hide('sp-hazard-section');
   hide('sp-sec-walldist');
@@ -1349,8 +1371,9 @@ function openKeypad(target) {
   document.getElementById('kp-hint').textContent = kpTarget === 'dim'
     ? 'Max dimension of obstruction (in), then OK'
     : 'Deflector height above obstruction bottom (in), then OK';
-  document.getElementById('kp-display').textContent = kpBuffer || '0';
+  document.getElementById('kp-display').textContent     = fmtKpDisplay(kpBuffer) || '0';
 
+  document.querySelectorAll('.dist-field').forEach(f => f.classList.remove('active-field'));
   const activeId = kpTarget === 'dim' ? 'field-obs-dim' : 'field-b-in';
   document.getElementById(activeId).classList.add('active-field');
   document.getElementById('kp-overlay').classList.add('open');
@@ -1431,7 +1454,7 @@ function kpKey(key) {
 // NFPA 13 LOOKUP TABLES
 // ═══════════════════════════════════════════════════
 
-// Table 8.6.5.1.2 — Standard Pendent & Upright (SSU/SSP)
+// Table 10.2.7.1.2 — Standard Pendent & Upright (SSU/SSP) — 2019
 const TABLE_UPRIGHT = [
   { minA: 0,   maxB: 0    },
   { minA: 12,  maxB: 2.5  },
@@ -1449,7 +1472,30 @@ const TABLE_UPRIGHT = [
   { minA: 84,  maxB: 35   },
 ];
 
-// Table 8.7.5.1.4 — Standard Sidewall Along-Wall obstructions
+// Table 11.2.5.1.2 — Extended Coverage Pendent & Upright (ECU/ECP) — 2019
+const TABLE_ECU = [
+  { minA: 0,   maxB: 0    },
+  { minA: 12,  maxB: 0    },
+  { minA: 18,  maxB: 1    },
+  { minA: 24,  maxB: 1    },
+  { minA: 30,  maxB: 1    },
+  { minA: 36,  maxB: 3    },
+  { minA: 42,  maxB: 3    },
+  { minA: 48,  maxB: 5    },
+  { minA: 54,  maxB: 7    },
+  { minA: 60,  maxB: 7    },
+  { minA: 66,  maxB: 7    },
+  { minA: 72,  maxB: 9    },
+  { minA: 78,  maxB: 11   },
+  { minA: 84,  maxB: 14   },
+  { minA: 90,  maxB: 14   },
+  { minA: 96,  maxB: 15   },
+  { minA: 102, maxB: 17   },
+  { minA: 108, maxB: 19   },
+  { minA: 114, maxB: 21   },
+];
+
+// Table 10.3.6.1.4 — Standard Sidewall Along-Wall obstructions
 const TABLE_SW_ALONG_WALL = [
   { minA: 4,  maxB: 1     },
   { minA: 6,  maxB: 2     },
@@ -1468,7 +1514,7 @@ const TABLE_SW_ALONG_WALL = [
   { minA: 84, maxB: 17.5  },
 ];
 
-// Table 8.10.6.1.2 — Residential Upright & Pendent
+// Table 12.1.10.1.2 — Residential Upright & Pendent
 const TABLE_RES_UPRIGHT = [
   { minA: 0,   maxB: 0  },
   { minA: 12,  maxB: 0  },
@@ -1486,7 +1532,7 @@ const TABLE_RES_UPRIGHT = [
   { minA: 84,  maxB: 14 },
 ];
 
-// Table 8.10.7.1.3 — Residential Sidewall (general obstructions)
+// Table 12.1.11.1.3 — Residential Sidewall (general obstructions)
 // Minimum A = 8 ft (96 in); "Less than 8 ft — Not allowed"
 const TABLE_RES_SW = [
   { minA: 96,  maxB: 1  },
@@ -1500,7 +1546,7 @@ const TABLE_RES_SW = [
   { minA: 204, maxB: 14 },
 ];
 
-// Table 8.10.7.1.4 — Residential Sidewall Along-Wall obstructions
+// Table 12.1.11.1.4 — Residential Sidewall Along-Wall obstructions
 const TABLE_RES_SW_ALONG_WALL = [
   { minA: 0,  maxB: 0  },
   { minA: 18, maxB: 1  },
@@ -1520,41 +1566,41 @@ function lookupMinA(table, bInches) {
   return null;
 }
 
-// Table 8.6.2.2.1 — Standard Pendent & Upright Spacing
+// Table 10.2.4.2.1 — Standard Pendent & Upright Spacing
 function lookupUprightSpacing(hazard, construction, sysType) {
   if (hazard === 'light') {
     if (['nc_unob','nc_ob','cb_unob_none','cb_unob_3ft'].includes(construction)) {
-      if (sysType === 'pipe_sched') return { maxArea: 200, maxSpacing: 15, minSpacing: 6, code: 'Table 8.6.2.2.1(a)' };
-      return { maxArea: 225, maxSpacing: 15, minSpacing: 6, code: 'Table 8.6.2.2.1(a)' };
+      if (sysType === 'pipe_sched') return { maxArea: 200, maxSpacing: 15, minSpacing: 6, code: 'Table 10.2.4.2.1(a)' };
+      return { maxArea: 225, maxSpacing: 15, minSpacing: 6, code: 'Table 10.2.4.2.1(a)' };
     }
-    if (construction === 'cb_unob_lt3ft') return { maxArea: 130, maxSpacing: 15, minSpacing: 6, code: 'Table 8.6.2.2.1(a)' };
-    if (construction === 'cb_ob_3ft')     return { maxArea: 168, maxSpacing: 15, minSpacing: 6, code: 'Table 8.6.2.2.1(a)' };
-    if (construction === 'cb_ob_lt3ft')   return { maxArea: 130, maxSpacing: 15, minSpacing: 6, code: 'Table 8.6.2.2.1(a)' };
-    if (construction === 'concealed')     return { maxArea: 120, maxSpacing: '15 (slope) / 10 (\u22a5 slope)', minSpacing: 6, code: 'Table 8.6.2.2.1(a) \u00b7 See \u00a7 8.6.4.1.4' };
+    if (construction === 'cb_unob_lt3ft') return { maxArea: 130, maxSpacing: 15, minSpacing: 6, code: 'Table 10.2.4.2.1(a)' };
+    if (construction === 'cb_ob_3ft')     return { maxArea: 168, maxSpacing: 15, minSpacing: 6, code: 'Table 10.2.4.2.1(a)' };
+    if (construction === 'cb_ob_lt3ft')   return { maxArea: 130, maxSpacing: 15, minSpacing: 6, code: 'Table 10.2.4.2.1(a)' };
+    if (construction === 'concealed')     return { maxArea: 120, maxSpacing: '15 (slope) / 10 (\u22a5 slope)', minSpacing: 6, code: 'Table 10.2.4.2.1(a) \u00b7 See \u00a7 8.6.4.1.4' };
   }
-  if (hazard === 'ordinary') return { maxArea: 130, maxSpacing: 15, minSpacing: 6, code: 'Table 8.6.2.2.1(b)' };
+  if (hazard === 'ordinary') return { maxArea: 130, maxSpacing: 15, minSpacing: 6, code: 'Table 10.2.4.2.1(b)' };
   if (hazard === 'extra') {
-    if (sysType === 'pipe_sched') return { maxArea: 90,  maxSpacing: 12, minSpacing: 6, code: 'Table 8.6.2.2.1(c)' };
-    if (sysType === 'hc_hi')      return { maxArea: 100, maxSpacing: 12, minSpacing: 6, code: 'Table 8.6.2.2.1(c)' };
-    if (sysType === 'hc_lo')      return { maxArea: 130, maxSpacing: 15, minSpacing: 6, code: 'Table 8.6.2.2.1(c)' };
+    if (sysType === 'pipe_sched') return { maxArea: 90,  maxSpacing: 12, minSpacing: 6, code: 'Table 10.2.4.2.1(c)' };
+    if (sysType === 'hc_hi')      return { maxArea: 100, maxSpacing: 12, minSpacing: 6, code: 'Table 10.2.4.2.1(c)' };
+    if (sysType === 'hc_lo')      return { maxArea: 130, maxSpacing: 15, minSpacing: 6, code: 'Table 10.2.4.2.1(c)' };
   }
   if (hazard === 'highpiled') {
-    if (sysType === 'hc_hi') return { maxArea: 100, maxSpacing: 12, minSpacing: 6, code: 'Table 8.6.2.2.1(d)' };
-    if (sysType === 'hc_lo') return { maxArea: 130, maxSpacing: 15, minSpacing: 6, code: 'Table 8.6.2.2.1(d)' };
-    return { maxArea: null, maxSpacing: null, minSpacing: 6, code: 'Table 8.6.2.2.1(d)', note: 'Pipe schedule not listed for high-piled storage. Hydraulic calculation required.' };
+    if (sysType === 'hc_hi') return { maxArea: 100, maxSpacing: 12, minSpacing: 6, code: 'Table 10.2.4.2.1(d)' };
+    if (sysType === 'hc_lo') return { maxArea: 130, maxSpacing: 15, minSpacing: 6, code: 'Table 10.2.4.2.1(d)' };
+    return { maxArea: null, maxSpacing: null, minSpacing: 6, code: 'Table 10.2.4.2.1(d)', note: 'Pipe schedule not listed for high-piled storage. Hydraulic calculation required.' };
   }
   return null;
 }
 
-// Table 8.7.2.2.1 — Standard Sidewall Spacing
+// Table 10.3.3 — Standard Sidewall Spacing
 function lookupSidewallSpacing(hazard, ceil) {
   if (hazard === 'light') {
-    if (ceil === 'combustible')    return { maxS: 14, maxL: 12, maxArea: 120, code: 'Table 8.7.2.2.1' };
-    if (ceil === 'noncombustible') return { maxS: 14, maxL: 14, maxArea: 196, code: 'Table 8.7.2.2.1' };
+    if (ceil === 'combustible')    return { maxS: 14, maxL: 12, maxArea: 120, code: 'Table 10.3.3' };
+    if (ceil === 'noncombustible') return { maxS: 14, maxL: 14, maxArea: 196, code: 'Table 10.3.3' };
   }
   if (hazard === 'ordinary') {
-    if (ceil === 'combustible')    return { maxS: 10, maxL: 10, maxArea: 80,  code: 'Table 8.7.2.2.1' };
-    if (ceil === 'noncombustible') return { maxS: 10, maxL: 10, maxArea: 100, code: 'Table 8.7.2.2.1' };
+    if (ceil === 'combustible')    return { maxS: 10, maxL: 10, maxArea: 80,  code: 'Table 10.3.3' };
+    if (ceil === 'noncombustible') return { maxS: 10, maxL: 10, maxArea: 100, code: 'Table 10.3.3' };
   }
   return null;
 }
@@ -1583,6 +1629,7 @@ function setCoverage(val) {
   state.obs.orient      = null;
   state.obs.swObsOrient = null;
   state.obs.obsType     = null;
+  state.obs.soffitDeep  = null;
   state.obs.bIn         = 0;
   state.obs.obsDim      = 0;
 
@@ -1607,7 +1654,8 @@ function setCoverage(val) {
 
   // Clear all downstream button selections
   ['btn-sw-along','btn-sw-vert','btn-sw-horiz',
-   'btn-obs-header','btn-obs-soffit'].forEach(id =>
+   'btn-obs-header','btn-obs-soffit',
+   'btn-soffit-yes','btn-soffit-no'].forEach(id =>
     document.getElementById(id).classList.remove('active'));
 
   // Reset distance displays
@@ -1618,6 +1666,7 @@ function setCoverage(val) {
   show('obs-sec-2');
   hide('obs-sec-sw-orient');
   hide('obs-sec-obstype');
+  hide('obs-sec-soffit-depth');
   hide('obs-sec-dist');
   hide('obs-sec-dim');
 
@@ -1630,6 +1679,7 @@ function setOrientation(val) {
   state.obs.orient      = val;
   state.obs.swObsOrient = null;
   state.obs.obsType     = null;
+  state.obs.soffitDeep  = null;
   state.obs.bIn         = 0;
   state.obs.obsDim      = 0;
 
@@ -1639,7 +1689,8 @@ function setOrientation(val) {
 
   // Clear all downstream button selections
   ['btn-sw-along','btn-sw-vert','btn-sw-horiz',
-   'btn-obs-header','btn-obs-soffit'].forEach(id =>
+   'btn-obs-header','btn-obs-soffit',
+   'btn-soffit-yes','btn-soffit-no'].forEach(id =>
     document.getElementById(id).classList.remove('active'));
 
   // Reset distance displays
@@ -1649,11 +1700,13 @@ function setOrientation(val) {
   if (val === 'sidewall') {
     show('obs-sec-sw-orient');
     hide('obs-sec-obstype');
+    hide('obs-sec-soffit-depth');
     hide('obs-sec-dist');
     hide('obs-sec-dim');
   } else {
     hide('obs-sec-sw-orient');
     show('obs-sec-obstype');
+    hide('obs-sec-soffit-depth');
     hide('obs-sec-dist');
     hide('obs-sec-dim');
   }
@@ -1663,7 +1716,6 @@ function setOrientation(val) {
 }
 
 function setSWObsOrient(val) {
-  state.obs.swObsOrient = val;
   state.obs.bIn         = 0;
   state.obs.obsDim      = 0;
 
@@ -1692,13 +1744,53 @@ function setSWObsOrient(val) {
 }
 
 function setObstruction(val) {
-  state.obs.obsType = val;
-  state.obs.bIn     = 0;
+  state.obs.obsType    = val;
+  state.obs.bIn        = 0;
+  state.obs.soffitDeep = null;
   document.getElementById('val-b-in').textContent = '0';
   document.getElementById('btn-obs-header').classList.toggle('active', val === 'header');
   document.getElementById('btn-obs-soffit').classList.toggle('active', val === 'soffit');
-  show('obs-sec-dist');
+  ['btn-soffit-yes','btn-soffit-no'].forEach(id => document.getElementById(id).classList.remove('active'));
   clearObsResult();
+
+  if (val === 'soffit') {
+    show('obs-sec-soffit-depth');
+    hide('obs-sec-dist');
+    document.getElementById('dist-badge').textContent = '5';
+  } else {
+    hide('obs-sec-soffit-depth');
+    show('obs-sec-dist');
+    document.getElementById('dist-badge').textContent = '4';
+  }
+  updateObsCalcBtn();
+  updateObsPrompt();
+}
+
+function setSoffitDepth(isShallow) {
+  state.obs.soffitDeep = !isShallow;
+  document.getElementById('btn-soffit-yes').classList.toggle('active',  isShallow);
+  document.getElementById('btn-soffit-no').classList.toggle('active',  !isShallow);
+  clearObsResult();
+
+  if (isShallow) {
+    // ≤ 24 in — show result immediately, no deflector height needed
+    hide('obs-sec-dist');
+    const covLabel = state.obs.coverage.charAt(0).toUpperCase() + state.obs.coverage.slice(1);
+    const isRes    = state.obs.coverage === 'residential';
+    const codeRef  = isRes
+      ? 'NFPA\u00a013\u20132019 \u00a7\u00a012.1.10.1.2(c)'
+      : state.obs.coverage === 'extended'
+        ? 'NFPA\u00a013\u20132019 \u00a7\u00a011.2.5.1.2(c)'
+        : 'NFPA\u00a013\u20132019 \u00a7\u00a010.2.7.1.2(c)';
+    document.getElementById('obs-result').innerHTML = result_card(
+      'pass', '\u2705', 'NO ADDITIONAL PROTECTION REQUIRED', 'SOFFIT \u2264 24 IN',
+      'Soffits that do not project more than <strong>24\u00a0in (600\u00a0mm)</strong> from the wall do not require additional sprinkler protection beneath them.',
+      codeRef + '\u00a0\u00b7\u00a0' + covLabel + ' ' + state.obs.orient
+    );
+  } else {
+    // > 24 in — proceed to deflector height
+    show('obs-sec-dist');
+  }
   updateObsCalcBtn();
   updateObsPrompt();
 }
@@ -1744,7 +1836,13 @@ function updateObsCalcBtn() {
       else if (o.coverage === 'residential')   { ready = true; }
       else { ready = o.obsDim > 0; }
     } else {
-      ready = !!o.obsType;
+      if (!o.obsType) { ready = false; }
+      else if (o.obsType === 'soffit') {
+        // Soffit: only show calc button if > 24in (soffitDeep = true)
+        // If ≤ 24in (soffitDeep = false), result shown inline — no calc button needed
+        ready = o.soffitDeep === true;
+      }
+      // header: just needs obsType set — already true
     }
   }
   document.getElementById('calc-obs-btn').classList.toggle('hidden', !ready);
@@ -1767,11 +1865,11 @@ function updateSpCalcBtn() {
   // Show/hide step 4 wall distance section
   document.getElementById('sp-sec-walldist').classList.toggle('hidden', !ready);
   if (!ready) {
-    // reset wall inputs when steps above change
     spWall.ft = 0; spWall.in = 0;
-    document.getElementById('val-sp-wall-ft').textContent = '0';
-    document.getElementById('val-sp-wall-in').textContent = '0';
-    document.getElementById('sp-wall-result').innerHTML = '';
+    const wft = document.getElementById('val-sp-wall-ft');
+    const win = document.getElementById('val-sp-wall-in');
+    if (wft) wft.textContent = '0';
+    if (win) win.textContent = '0';
   }
 }
 
@@ -1793,6 +1891,14 @@ function openSpWallKeypad(target) {
 }
 
 // ── Wall distance calculation — returns HTML string ───────────────────
+function fmtSpFt(val) {
+  const ft  = Math.floor(val);
+  const ins = Math.round((val - ft) * 12 * 10) / 10;
+  if (ins === 0)  return ft + ' ft';
+  if (ft  === 0)  return ins + ' in';
+  return ft + ' ft ' + ins + ' in';
+}
+
 function calcWallDistHTML() {
   const dFt = spWall.ft + spWall.in / 12;
   if (dFt <= 0) return '';
@@ -1809,7 +1915,7 @@ function calcWallDistHTML() {
       return `<div class="rl-warn" style="margin-top:12px;">Wall distance ${fmtSpFt(dFt)} exceeds maximum of ${fmtSpFt(limits.maxS / 2)} for this hazard.</div>`;
     }
     const maxOther = Math.min(limits.maxL, limits.maxArea / sUsed);
-    return spWallResultHTML(dFt, sUsed, maxOther, 'NFPA 13–2016 Table 8.7.2.2.1');
+    return spWallResultHTML(dFt, sUsed, maxOther, 'NFPA 13–2019 Table 10.3.3');
   }
 
   const limits = lookupUprightSpacing(hazard, constr, sys);
@@ -1864,10 +1970,12 @@ function calculateObstruction() {
       ? covLabel + ' Pendent' + (isRes ? '' : ' (SSP)')
       : covLabel + ' Upright' + (isRes ? '' : ' (SSU)');
 
-    const table   = isRes ? TABLE_RES_UPRIGHT : TABLE_UPRIGHT;
-    const codeRef = isRes
-      ? 'NFPA\u00a013\u20132016 Table 8.10.6.1.2'
-      : 'NFPA\u00a013\u20132016 Table 8.6.5.1.2';
+    const table   = isRes               ? TABLE_RES_UPRIGHT
+                  : o.coverage === 'extended' ? TABLE_ECU
+                  : TABLE_UPRIGHT;
+    const codeRef = isRes               ? 'NFPA\u00a013\u20132019 Table 12.1.10.1.2'
+                  : o.coverage === 'extended' ? 'NFPA\u00a013\u20132019 Table 11.2.5.1.2'
+                  : 'NFPA\u00a013\u20132019 Table 10.2.7.1.2';
 
     if (bInches === 0) {
       resultEl.innerHTML = result_card('pass','\u2705','NO CLEARANCE REQUIRED','ANY DISTANCE',
@@ -1900,8 +2008,8 @@ function calculateObstruction() {
     const bInches = o.bIn;
     const table   = isRes ? TABLE_RES_SW_ALONG_WALL : TABLE_SW_ALONG_WALL;
     const codeRef = isRes
-      ? 'NFPA\u00a013\u20132016 Table 8.10.7.1.4'
-      : 'NFPA\u00a013\u20132016 Table 8.7.5.1.4';
+      ? 'NFPA\u00a013\u20132019 Table 12.1.11.1.4'
+      : 'NFPA\u00a013\u20132019 Table 10.3.6.1.4';
     const minA = lookupMinA(table, bInches);
     if (minA === null) {
       const maxVal = isRes ? '14\u00a0in' : '17.5\u00a0in';
@@ -1916,10 +2024,10 @@ function calculateObstruction() {
     return;
   }
 
-  // Vertical or Horizontal — Residential uses Table 8.10.7.1.3 (B input)
+  // Vertical or Horizontal — Residential uses Table 12.1.11.1.3 (B input)
   if (isRes) {
     const bInches = o.bIn;
-    const codeRef = 'NFPA\u00a013\u20132016 Table 8.10.7.1.3';
+    const codeRef = 'NFPA\u00a013\u20132019 Table 12.1.11.1.3';
     if (o.swObsOrient === 'vertical' || o.swObsOrient === 'horizontal') {
       const minA = lookupMinA(TABLE_RES_SW, bInches);
       if (minA === null) {
@@ -1947,10 +2055,10 @@ function calculateObstruction() {
   const raw     = 3 * dim;
   const minA    = isHoriz ? Math.min(raw, 24) : raw;
   const codeRef = isHoriz
-    ? 'NFPA\u00a013\u20132016 \u00a7\u00a08.7.5.2.1.3(b)'
-    : 'NFPA\u00a013\u20132016 \u00a7\u00a08.7.5.2.1.3(a)';
+    ? 'NFPA\u00a013\u20132019 \u00a7\u00a010.3.6.2.1.3(b)'
+    : 'NFPA\u00a013\u20132019 \u00a7\u00a010.3.6.2.1.3(a)';
   const capNote = (isHoriz && raw > 24)
-    ? ' (capped at 24\u00a0in per \u00a7\u00a08.7.5.2.1.3(b))'
+    ? ' (capped at 24\u00a0in per \u00a7\u00a010.3.6.2.1.3(b))'
     : '';
   resultEl.innerHTML = result_card('info','\ud83d\udccf','MINIMUM DISTANCE', fmtInches(minA),
     'The sidewall sprinkler must be at least <strong>' + fmtInches(minA) + '</strong> from the ' +
@@ -2052,7 +2160,7 @@ function calculateSpacing() {
         <div class="result-head"><div class="result-icon">⛔</div><div class="result-status">NOT PERMITTED</div></div>
         <div class="result-body">
           <div class="result-sub">Standard sidewall sprinklers are not listed for extra hazard or high-piled storage. Use upright or pendent heads.</div>
-          <div class="result-code">NFPA 13–2016 § 8.4.2</div>
+          <div class="result-code">NFPA 13–2019 § 10.1.2</div>
         </div>
       </div>`;
     return;
@@ -2177,15 +2285,15 @@ function setLayoutSys(val) {
 }
 
 // ═══════════════════════════════════════════════════
-// ROOM LAYOUT LIMITS (Table 8.6.2.2.1)
+// ROOM LAYOUT LIMITS (Table 10.2.4.2.1)
 // ═══════════════════════════════════════════════════
 function getLayoutLimits(hazard, sysType) {
-  if (hazard === 'light')    return { maxArea: 225, maxSpacing: 15, code: 'Table 8.6.2.2.1(a)' };
-  if (hazard === 'ordinary') return { maxArea: 130, maxSpacing: 15, code: 'Table 8.6.2.2.1(b)' };
+  if (hazard === 'light')    return { maxArea: 225, maxSpacing: 15, code: 'Table 10.2.4.2.1(a)' };
+  if (hazard === 'ordinary') return { maxArea: 130, maxSpacing: 15, code: 'Table 10.2.4.2.1(b)' };
   if (hazard === 'extra') {
-    if (sysType === 'pipe_sched') return { maxArea: 90,  maxSpacing: 12, code: 'Table 8.6.2.2.1(c)' };
-    if (sysType === 'hc_hi')      return { maxArea: 100, maxSpacing: 12, code: 'Table 8.6.2.2.1(c)' };
-    if (sysType === 'hc_lo')      return { maxArea: 130, maxSpacing: 15, code: 'Table 8.6.2.2.1(c)' };
+    if (sysType === 'pipe_sched') return { maxArea: 90,  maxSpacing: 12, code: 'Table 10.2.4.2.1(c)' };
+    if (sysType === 'hc_hi')      return { maxArea: 100, maxSpacing: 12, code: 'Table 10.2.4.2.1(c)' };
+    if (sysType === 'hc_lo')      return { maxArea: 130, maxSpacing: 15, code: 'Table 10.2.4.2.1(c)' };
   }
   return null;
 }
@@ -2375,6 +2483,15 @@ let dlInches = 0;
 function dlLoad()     { try { return JSON.parse(localStorage.getItem('nfpa_jobs') || '{}'); } catch(e) { return {}; } }
 function dlSave(jobs) { try { localStorage.setItem('nfpa_jobs', JSON.stringify(jobs)); } catch(e) {} }
 
+// Restore active job on page load
+(function() {
+  const saved = localStorage.getItem('nfpa_active_job');
+  if (saved) {
+    const jobs = dlLoad();
+    if (jobs[saved]) dlJobId = saved;
+  }
+})();
+
 function dlCreateJob() {
   const nameEl = document.getElementById('dl-new-job-name');
   const name   = nameEl.value.trim();
@@ -2385,6 +2502,7 @@ function dlCreateJob() {
   dlSave(jobs);
   nameEl.value = '';
   dlJobId = id;
+  localStorage.setItem('nfpa_active_job', id);
   dlRender();
 }
 
@@ -2496,6 +2614,7 @@ async function dlSendReport() {
     delete jobs[dlJobId];
     dlSave(jobs);
     dlJobId = null;
+    localStorage.removeItem('nfpa_active_job');
     statusEl.style.color = '#4ade80';
     statusEl.textContent = '✓ Sent to ' + email + ' — Job removed';
     setTimeout(function() { dlRender(); }, 1500);
@@ -2515,6 +2634,11 @@ function resetDryLog() {
   if (n) n.value = '';
   var s = document.getElementById('dl-status');
   if (s) { s.textContent = ''; s.style.color = 'var(--text2)'; }
+  // Restore active job from localStorage if needed
+  if (!dlJobId) {
+    const saved = localStorage.getItem('nfpa_active_job');
+    if (saved) { const jobs = dlLoad(); if (jobs[saved]) dlJobId = saved; }
+  }
   dlRender();
 }
 
